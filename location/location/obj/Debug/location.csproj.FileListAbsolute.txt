@@ -1,0 +1,15 @@
+G:\554538\year2\Networking\location\location\bin\Debug\location.exe.config
+G:\554538\year2\Networking\location\location\bin\Debug\location.exe
+G:\554538\year2\Networking\location\location\bin\Debug\location.pdb
+G:\554538\year2\Networking\location\location\obj\Debug\location.csprojAssemblyReference.cache
+G:\554538\year2\Networking\location\location\obj\Debug\MainWindow.g.cs
+G:\554538\year2\Networking\location\location\obj\Debug\App.g.cs
+G:\554538\year2\Networking\location\location\obj\Debug\location_MarkupCompile.cache
+G:\554538\year2\Networking\location\location\obj\Debug\location_MarkupCompile.lref
+G:\554538\year2\Networking\location\location\obj\Debug\MainWindow.baml
+G:\554538\year2\Networking\location\location\obj\Debug\location.g.resources
+G:\554538\year2\Networking\location\location\obj\Debug\location.Properties.Resources.resources
+G:\554538\year2\Networking\location\location\obj\Debug\location.csproj.GenerateResource.cache
+G:\554538\year2\Networking\location\location\obj\Debug\location.csproj.CoreCompileInputs.cache
+G:\554538\year2\Networking\location\location\obj\Debug\location.exe
+G:\554538\year2\Networking\location\location\obj\Debug\location.pdb
