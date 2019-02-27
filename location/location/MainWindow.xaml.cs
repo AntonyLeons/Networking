@@ -39,7 +39,9 @@ namespace location
                 StreamReader sr = new StreamReader(client.GetStream());
                 StringBuilder appendLine = new StringBuilder();
                 StringBuilder appendData = new StringBuilder();
-                string LocationData = "";
+                string location = "";
+                string username;
+                string input="";
                 int c = 0;
                 string response = "";
                 sw.AutoFlush = true;
@@ -49,28 +51,20 @@ namespace location
                         if (Location.Text == "" && User.Text != "")
                         {
                             sw.Write("GET /" + User.Text + "\r\n");
-
-                            while (sr.Peek() >= 0)
-                            {
-                            c++;
-                            if (c <= 3)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            else
-                            {
-                                appendData.Append(sr.ReadLine());
-                            }
-                            }
-                            response = appendLine.ToString();
-                            LocationData = appendData.ToString();
-                            if (response.Contains("404 Not Found"))
+                        while (sr.Peek() >= 0)
+                        {
+                            input = sr.ReadLine();
+                            appendLine.Append(input);
+                        }
+                        response = appendLine.ToString();
+                        location = input;
+                        if (response.Contains("404 Not Found"))
                             {
                                 Status.AppendText(response + "\n");
                             }
                             else
                             {
-                                Status.AppendText(User.Text + " is " + LocationData + "\n");
+                                Status.AppendText(User.Text + " is " + location + "\n");
                             }
                         }
                         else if (Location.Text != "" && User.Text != "")
@@ -93,31 +87,23 @@ namespace location
                     }
                     else if (Http1_0.IsChecked == true) 
                     {
-                        
                         if (Location.Text == "" && User.Text != "")
                         {
                             sw.Write("GET /?" + User.Text + " HTTP/1.0" + "\r\n" + "\r\n");
-                            while (sr.Peek() >= 0)
+                        while (sr.Peek() >= 0)
                         {
-                            c++;
-                            if (c <= 3)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            else
-                            {
-                                appendData.Append(sr.ReadLine());
-                            }
+                            input = sr.ReadLine();
+                            appendLine.Append(input);
                         }
                         response = appendLine.ToString();
-                        LocationData = appendData.ToString();
+                        location = input;
                         if (response.Contains("404 Not Found"))
                         {
                             Status.AppendText(response + "\n");
                         }
                         else
                         {
-                            Status.AppendText(User.Text + " is " + LocationData + "\n");
+                            Status.AppendText(User.Text + " is " + location + "\n");
                         }
                     }
                         else if (Location.Text != "" && User.Text != "")
@@ -144,27 +130,20 @@ namespace location
                         if (Location.Text == "" && User.Text != "")
                         {
                             sw.Write("GET /?name=" + User.Text + " HTTP/1.1" + "\r\n" + "Host: " + Address.Text + "\r\n" + "\r\n");
-                            while (sr.Peek() >= 0)
+                        while (sr.Peek() >= 0)
                         {
-                            c++;
-                            if (c <= 3)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            else
-                            {
-                                appendData.Append(sr.ReadLine());
-                            }
+                            input = sr.ReadLine();
+                            appendLine.Append(input);
                         }
                         response = appendLine.ToString();
-                        LocationData = appendData.ToString();
+                        location = input;
                         if (response.Contains("404 Not Found"))
                         {
                             Status.AppendText(response + "\n");
                         }
                         else
                         {
-                            Status.AppendText(User.Text + " is " + LocationData + "\n");
+                            Status.AppendText(User.Text + " is " + location + "\n");
                         }
                     }
                         else if (Location.Text != "" && User.Text != "")

@@ -21,7 +21,6 @@ namespace location
             {
                 try
                 {
-                    List<string> clean = new List<string>(args);
                     TcpClient client = new TcpClient();
                     string host = "whois.net.dcs.hull.ac.uk";
                     int port = 43;
