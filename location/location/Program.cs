@@ -53,11 +53,12 @@ namespace location
                                 }
                                 break;
                         }
+                    }
                         if (username == null)
                         {
                             Console.WriteLine("Too few arguments");
                         }
-                    }
+                    
                     client.Connect(host, port);
                     client.ReceiveTimeout = 1000;
                     client.SendTimeout = 1000;
@@ -134,7 +135,7 @@ namespace location
                                 }
                             }
                             break;
-                        case "h0":
+                        case "-h0":
                             if (location==null)
                             {
                                 sw.Write("GET /?" + username + " HTTP/1.0" + "\r\n" + "\r\n");
@@ -171,7 +172,7 @@ namespace location
                                 }
                             }
                             break;
-                        case "h1":
+                        case "-h1":
                             if (location==null)
                             {
                                 sw.Write("GET /?name=" + username + " HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "\r\n");
