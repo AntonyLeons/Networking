@@ -76,28 +76,19 @@ namespace locationserver
                 sw.AutoFlush = true;
 
                 DateTime localDate = DateTime.Now;
-                int c=0;
                 string datastring;
                 string locationstring;
                 string userstring;
-                string input;
                 StringBuilder appendLine = new StringBuilder();
                 StringBuilder appendData = new StringBuilder();
+                
                 while (sr.Peek() >= 0)
                 {
-                    //   c++;
-                    //  if (c <= 3)
-                    //  {
-                    input = sr.ReadLine();
-                        appendLine.Append(input + " ");
-                    // }
-                    //  else
-                    //  {
                     appendData.Clear();
-                    appendData.Append(input);
-                  // }
+                    appendData.Append(sr.ReadLine());
+                    appendLine.Append(appendData.ToString() + " ");
                 }
-                datastring = appendLine.ToString().Trim(); ;
+                datastring = appendLine.ToString().Trim();
                 locationstring = appendData.ToString().Trim();
                 string[] Whois = datastring.Split(new char[] { ' ' }, 2);
                 List<string> sections = new List<string>(datastring.Split(' ').ToList());
