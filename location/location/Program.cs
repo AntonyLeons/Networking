@@ -32,8 +32,8 @@ namespace location
                     {
                         switch (args[i])
                         {
-                            case "-h": host = args[i++]; break;
-                            case "-p": port = int.Parse(args[i++]); break;
+                            case "-h": host = args[++i]; break;
+                            case "-p": port = int.Parse(args[++i]); break;
                             case "-h9":
                             case "-h0":
                             case "-h1": protocol = args[i]; break;

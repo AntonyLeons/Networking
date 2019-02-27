@@ -53,11 +53,18 @@ namespace location
                             sw.Write("GET /" + User.Text + "\r\n");
                         while (sr.Peek() >= 0)
                         {
-                            input = sr.ReadLine();
-                            appendLine.Append(input);
+                            c++;
+                            if (c <= 3)
+                            {
+                                appendLine.Append(sr.ReadLine());
+                            }
+                            else
+                            {
+                                appendData.Append(sr.ReadLine());
+                            }
                         }
-                        response = appendLine.ToString();
-                        location = input;
+                            response = appendLine.ToString();
+                            location = appendData.ToString();
                         if (response.Contains("404 Not Found"))
                             {
                                 Status.AppendText(response + "\n");
@@ -92,11 +99,18 @@ namespace location
                             sw.Write("GET /?" + User.Text + " HTTP/1.0" + "\r\n" + "\r\n");
                         while (sr.Peek() >= 0)
                         {
-                            input = sr.ReadLine();
-                            appendLine.Append(input);
+                            c++;
+                            if (c <= 3)
+                            {
+                                appendLine.Append(sr.ReadLine());
+                            }
+                            else
+                            {
+                                appendData.Append(sr.ReadLine());
+                            }
                         }
                         response = appendLine.ToString();
-                        location = input;
+                        location = appendData.ToString();
                         if (response.Contains("404 Not Found"))
                         {
                             Status.AppendText(response + "\n");
@@ -132,11 +146,18 @@ namespace location
                             sw.Write("GET /?name=" + User.Text + " HTTP/1.1" + "\r\n" + "Host: " + Address.Text + "\r\n" + "\r\n");
                         while (sr.Peek() >= 0)
                         {
-                            input = sr.ReadLine();
-                            appendLine.Append(input);
+                            c++;
+                            if (c <= 3)
+                            {
+                                appendLine.Append(sr.ReadLine());
+                            }
+                            else
+                            {
+                                appendData.Append(sr.ReadLine());
+                            }
                         }
                         response = appendLine.ToString();
-                        location = input;
+                        location = appendData.ToString();
                         if (response.Contains("404 Not Found"))
                         {
                             Status.AppendText(response + "\n");

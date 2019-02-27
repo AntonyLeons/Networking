@@ -80,31 +80,22 @@ namespace locationserver
                 string datastring;
                 string locationstring;
                 string userstring;
-                string input;
+                string input="";
                 StringBuilder appendLine = new StringBuilder();
                 StringBuilder appendData = new StringBuilder();
-                while (sr.Peek() >= 0)
+                while (sr.Peek() > -1)
                 {
-                    //   c++;
-                    //  if (c <= 3)
-                    //  {
-                    input = sr.ReadLine();
-                        appendLine.Append(input + " ");
-                    // }
-                    //  else
-                    //  {
                     appendData.Clear();
-                    appendData.Append(input);
-                  // }
+                    appendData.Append(sr.ReadLine().Trim() + " ");
+                    appendLine.Append(appendData.ToString());
                 }
-                datastring = appendLine.ToString().Trim(); ;
-                locationstring = appendData.ToString().Trim();
+                datastring = appendLine.ToString().Trim();
+                locationstring = appendData.ToString();
                 string[] Whois = datastring.Split(new char[] { ' ' }, 2);
                 List<string> sections = new List<string>(datastring.Split(' ').ToList());
-
-                if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1") && (sections[0] == "GET" || sections[0] == "PUT")) //-h9
+                if (sections[0] == ("GET"))
                 {
-                    if (sections[0] == ("GET"))
+                    if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1")) //h9
                     {
                         sections.RemoveAt(0);
                         userstring = sections[0];
@@ -121,7 +112,44 @@ namespace locationserver
                             logstatement += "GET " + datastring + " ERROR: no entries found";
                         }
                     }
-                    if (sections[0] == ("PUT"))
+                    else if (sections.Contains("HTTP/1.0")) //-h0
+                    {
+                        sections.RemoveAt(0);
+                        userstring = sections[0];
+                        userstring = userstring.Remove(0, 2);
+
+                        if (data.ContainsKey(userstring))
+                        {
+                            sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n");
+                            logstatement += "GET " + datastring + " - OK";
+                        }
+                        else
+                        {
+                            sw.WriteLine("HTTP/1.0 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
+                            logstatement += "GET " + datastring + " ERROR: no entries found";
+                        }
+                    }
+                    else if (sections.Contains("HTTP/1.1")) //-h1
+                    {
+                        sections.RemoveAt(0);
+                        userstring = sections[0];
+                        userstring = userstring.Remove(0, 7);
+
+                        if (data.ContainsKey(userstring))
+                        {
+                            sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n"); //location ok responce 3
+                            logstatement += "GET " + datastring + " - OK";
+                        }
+                        else
+                        {
+                            sw.WriteLine("HTTP/1.1 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
+                            logstatement += "GET " + datastring + " ERROR: no entries found";
+                        }
+                    }
+                }
+                else if (sections[0] == ("PUT"))
+                {
+                    if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1") && (sections[0] == "GET" || sections[0] == "PUT")) //-h9
                     {
                         sections.RemoveAt(0);
                         userstring = sections[0];
@@ -141,27 +169,10 @@ namespace locationserver
                             logstatement += "Put " + datastring + " - OK";
                         }
                     }
-                } //-h9
-                else if (sections.Contains("HTTP/1.0")) //-h0
+                }
+                else if (sections[0]==("POST"))
                 {
-                    if (sections[0] == ("GET"))
-                    {
-                        sections.RemoveAt(0);
-                        userstring = sections[0];
-                        userstring = userstring.Remove(0, 2);
-
-                        if (data.ContainsKey(userstring))
-                        {
-                            sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n");
-                            logstatement += "GET " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            sw.WriteLine("HTTP/1.0 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
-                            logstatement += "GET " + datastring + " ERROR: no entries found";
-                        }
-                    }
-                    if (sections.Contains("POST"))
+                    if (sections.Contains("HTTP/1.0"))
                     {
                         sections.RemoveAt(0);
                         userstring = sections[0];
@@ -180,49 +191,32 @@ namespace locationserver
                             logstatement += "Put " + datastring + " - OK";
                         }
                     }
-                } // -h0
-                else if (sections.Contains("HTTP/1.1"))
-                {
-                    if (sections[0] == ("GET"))
+                    else if (sections.Contains("HTTP/1.1"))
                     {
-                        sections.RemoveAt(0);
-                        userstring = sections[0];
-                        userstring = userstring.Remove(0, 7);
+                        {
+                            userstring = locationstring.Remove(0, 5);
+                            userstring.Replace("&location=", " ");
+                            string[] tmp = userstring.Split(' ');
+                            userstring = tmp[0];
+                            locationstring = tmp[1];
 
-                        if (data.ContainsKey(userstring))
-                        {
-                            sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n"); //location ok responce 3
-                            logstatement += "GET " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            sw.WriteLine("HTTP/1.1 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
-                            logstatement += "GET " + datastring + " ERROR: no entries found";
+                            if (data.ContainsKey(userstring))
+                            {
+                                data[userstring] = locationstring;
+                                sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
+                                logstatement += "Put " + datastring + " - OK";
+                            }
+                            else
+                            {
+                                data.Add(userstring, locationstring);
+                                sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
+                                logstatement += "Put " + datastring + " - OK";
+                            }
                         }
                     }
-                    if (sections.Contains("POST"))
-                    {
-                        userstring = locationstring.Remove(0, 5);
-                        userstring.Replace("&location=", " ");
-                        string[] tmp = userstring.Split(' ');
-                        userstring = tmp[0];
-                        locationstring = tmp[1];
+                }
 
-                        if (data.ContainsKey(userstring))
-                        {
-                            data[userstring] = locationstring;
-                            sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
-                            logstatement += "Put " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            data.Add(userstring, locationstring);
-                            sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
-                            logstatement += "Put " + datastring + " - OK";
-                        }
-                    }
 
-                } //-h1
                 else if (Whois.Length == 2)
                 {
                     if (data.ContainsKey(Whois[0]))
