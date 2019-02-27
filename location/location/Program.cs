@@ -25,19 +25,38 @@ namespace location
                     TcpClient client = new TcpClient();
                     string host = "whois.net.dcs.hull.ac.uk";
                     int port = 43;
+                    string protocol = "whois";
+                    string username = null;
+                    string location = null;
+                    string input = "";
                     for (int i = 0; i < args.Length; i++)
                     {
-                        if (args[i]=="-h")
+                        switch (args[i])
                         {
-                            host = args[i + 1];
-                            clean.Remove(args[i]);
-                            clean.Remove(args[i + 1]);
+                            case "-h": host = args[i++]; break;
+                            case "-p": port = int.Parse(args[i++]); break;
+                            case "-h9":
+                            case "-h0":
+                            case "-h1": protocol = args[i]; break;
+
+                            default:
+                                if (username == null)
+                                {
+                                    username = args[i];
+                                }
+                                else if (location == null)
+                                {
+                                    location = args[i];
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Too many arguments");
+                                }
+                                break;
                         }
-                       else if (args[i]=="-p")
+                        if (username == null)
                         {
-                            port = Int32.Parse(args[i + 1]);
-                            clean.Remove(args[i]);
-                            clean.Remove(args[i + 1]);
+                            Console.WriteLine("Too few arguments");
                         }
                     }
                     client.Connect(host, port);
@@ -50,31 +69,124 @@ namespace location
                     string LocationData = "";
                     int c = 0;
                     bool flag = false;
-
                     string response = "";
                     sw.AutoFlush = true;
-
-                    for (int i = 0; i < clean.Count; i++)
+                    switch (protocol)
                     {
-                        if (clean[i] == "-h9")
-                        {
-                            clean.Remove(clean[i]);
-                            flag = true;
-                            if (clean.Count == 1)
+                        case "whois":
+                            if (location == null)
                             {
-                                sw.Write("GET /" + clean[0] + "\r\n");
+                                sw.WriteLine(username);
                                 while (sr.Peek() >= 0)
                                 {
-                                    c++;
-                                    if (c <= 3)
-                                    {
-                                        appendLine.Append(sr.ReadLine());
-                                    }
-                                    else
-                                    {
-                                        appendData.Append(sr.ReadLine());
-                                    }
+                                    appendLine.Append(sr.ReadLine());
                                 }
+                                response = appendLine.ToString();
+                                if (response.Contains("ERROR: no entries found"))
+                                {
+                                    Console.WriteLine(response);
+                                }
+                                else
+                                {
+                                    Console.WriteLine(username + " is " + response);
+                                }
+                            }
+                            else
+                            {
+                                sw.WriteLine(username + " " + location);
+                                while (sr.Peek() >= 0)
+                                {
+                                    appendLine.Append(sr.ReadLine());
+                                }
+                                response = appendLine.ToString();
+                                if (response.Contains("OK"))
+                                {
+                                    Console.WriteLine(username + " location changed to be " + location);
+                                }
+                            }
+                            break;
+                        case "-h9":
+                            if (location == null)
+                            {
+                                sw.Write("GET /" + username + "\r\n");
+                                while (sr.Peek() >= 0)
+                                {
+                                    input = sr.ReadLine();
+                                    appendLine.Append(input);
+                                }
+                                response = appendLine.ToString();
+                                location = input;
+                                if (response.Contains("404 Not Found"))
+                                {
+                                    Console.WriteLine(response);
+                                }
+                                else
+                                {
+                                    Console.WriteLine(username + " is " + location);
+                                }
+                            }
+                            else 
+                            {
+                                sw.Write("PUT /" + username + "\r\n" + "\r\n" + location + "\r \n");
+                                while (sr.Peek() >= 0)
+                                {
+                                    appendLine.Append(sr.ReadLine());
+                                }
+                                response = appendLine.ToString();
+                                if (response.Contains("OK"))
+                                {
+                                    Console.WriteLine(username + " location changed to be " + location);
+                                }
+                            }
+                            break;
+                        case "h0":
+                            if (location==null)
+                            {
+                                sw.Write("GET /?" + username + " HTTP/1.0" + "\r\n" + "\r\n");
+                                while (sr.Peek() >= 0)
+                                {
+                                    input = sr.ReadLine();
+                                    appendLine.Append(input);
+                                }
+                                response = appendLine.ToString();
+                                location = input;
+                                if (response.Contains("404 Not Found"))
+                                {
+                                    Console.WriteLine(response);
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine(username + " is " + LocationData);
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                sw.Write("POST /" + username + " HTTP/1.0" + "\r\n" + "Content-Length: " + location.Length + "\r\n" + "\r\n" + location);
+                                while (sr.Peek() >= 0)
+                                {
+                                    appendLine.Append(sr.ReadLine());
+                                }
+                                response = appendLine.ToString();
+                                if (response.Contains("OK"))
+                                {
+                                    Console.WriteLine(username + " location changed to be " + location);
+                                    break;
+                                }
+                            }
+                            break;
+                        case "h1":
+                            if (location==null)
+                            {
+                                sw.Write("GET /?name=" + username + " HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "\r\n");
+                                while (sr.Peek() >= 0)
+                                {
+                                    input = sr.ReadLine();
+                                    appendLine.Append(input);
+                                }
+                                response = appendLine.ToString();
+                                location = input;
                                 response = appendLine.ToString();
                                 LocationData = appendData.ToString();
                                 if (response.Contains("404 Not Found"))
@@ -84,13 +196,14 @@ namespace location
                                 }
                                 else
                                 {
-                                    Console.WriteLine(clean[0] + " is " + LocationData);
+                                    Console.WriteLine(username + " is " + LocationData);
                                     break;
                                 }
                             }
-                            else if (clean.Count == 2)
+                            else
                             {
-                                sw.Write("PUT /" + clean[0] + "\r\n" + "\r\n" + clean[1] + "\r \n");
+                                int length = username.Length + location.Length + 15;
+                                sw.Write("POST / " + "HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "Content-Length: " + length + "\r\n" + "\r\n" + "name=" + username + "&location=" + location);
                                 while (sr.Peek() >= 0)
                                 {
                                     appendLine.Append(sr.ReadLine());
@@ -98,158 +211,11 @@ namespace location
                                 response = appendLine.ToString();
                                 if (response.Contains("OK"))
                                 {
-                                    Console.WriteLine(clean[0] + " location changed to be " + clean[1]);
+                                    Console.WriteLine(username + " location changed to be " + location);
                                     break;
                                 }
                             }
-                            else
-                            {
-                                Console.WriteLine("Invalid arguments provided");
-                                break;
-                            }
-                        }
-                        else if (clean[i] == "-h0") 
-                        {
-                            clean.Remove(clean[i]);
-                            flag = true;
-                            if (clean.Count == 1)
-                            {
-                                sw.Write("GET /?" + clean[0] + " HTTP/1.0" + "\r\n" + "\r\n");
-                                while (sr.Peek() >= 0)
-                                {
-                                    c++;
-                                    if (c <= 3)
-                                    {
-                                        appendLine.Append(sr.ReadLine());
-                                    }
-                                    else
-                                    {
-                                        appendData.Append(sr.ReadLine());
-                                    }
-                                }
-                                response = appendLine.ToString();
-                                LocationData = appendData.ToString();
-                                if (response.Contains("404 Not Found"))
-                                {
-                                    Console.WriteLine(response);
-                                    break;
-                                }
-                                else
-                                {
-                                    Console.WriteLine(clean[0] + " is " + LocationData);
-                                    break;
-                                }
-                            }
-                            else if (clean.Count == 2)
-                            {
-                                sw.Write("POST /" + clean[0] + " HTTP/1.0" + "\r\n" + "Content-Length: " + clean[1].Length + "\r\n" + "\r\n" + clean[1]);
-                                while (sr.Peek() >= 0)
-                                {
-                                    appendLine.Append(sr.ReadLine());
-                                }
-                                response = appendLine.ToString();
-                                if (response.Contains("OK"))
-                                {
-                                    Console.WriteLine(clean[0] + " location changed to be " + clean[1]);
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Invalid arguments provided");
-                                break;
-                            }
-                        }
-                        else if (clean[i] == "-h1")
-                        {
-                            clean.Remove(clean[i]);
-                            flag = true;
-                            if (clean.Count == 1)
-                            {
-                                sw.Write("GET /?name=" + clean[0] + " HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "\r\n");
-                                while (sr.Peek() >= 0)
-                                {
-                                    c++;
-                                    if (c <= 3)
-                                    {
-                                        appendLine.Append(sr.ReadLine());
-                                    }
-                                    else
-                                    {
-                                        appendData.Append(sr.ReadLine());
-                                    }
-                                }
-                                response = appendLine.ToString();
-                                LocationData = appendData.ToString();
-                                if (response.Contains("404 Not Found"))
-                                {
-                                    Console.WriteLine(response);
-                                    break;
-                                }
-                                else
-                                {
-                                    Console.WriteLine(clean[0] + " is " + LocationData);
-                                    break;
-                                }
-                            }
-                            else if (clean.Count == 2)
-                            {
-                                int length = clean[0].Length + clean[1].Length + 15;
-                                sw.Write("POST / " + "HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "Content-Length: " + length + "\r\n" + "\r\n" + "name=" + clean[0] + "&location=" + clean[1]);
-                                while (sr.Peek() >= 0)
-                                {
-                                    appendLine.Append(sr.ReadLine());
-                                }
-                                response = appendLine.ToString();
-                                if (response.Contains("OK"))
-                                {
-                                    Console.WriteLine(clean[0] + " location changed to be " + clean[1]);
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Invalid arguments provided");
-                                break;
-                            }
-                        }
-                    }
-                    if (flag == false)
-                    {
-                        if (clean.Count == 1)
-                        {
-                            sw.WriteLine(clean[0]);
-                            while (sr.Peek() >= 0)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            response = appendLine.ToString();
-                            if (response.Contains("ERROR: no entries found"))
-                            {
-                                Console.WriteLine(response);
-                            }
-                            else
-                            {
-                                Console.WriteLine(clean[0] + " is " + response);
-                            }
-                        }
-                        else if (clean.Count == 2)
-                        {
-                            sw.WriteLine(clean[0] + " " + clean[1]);
-                            while (sr.Peek() >= 0)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            response = appendLine.ToString();
-                            if (response.Contains("OK"))
-                            {
-                                Console.WriteLine(clean[0] + " location changed to be " + clean[1]);
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid arguments provided");
-                        }
+                            break;
                     }
                 }
 
