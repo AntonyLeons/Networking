@@ -65,10 +65,6 @@ namespace location
                     StreamWriter sw = new StreamWriter(client.GetStream());
                     StreamReader sr = new StreamReader(client.GetStream());
                     StringBuilder appendLine = new StringBuilder();
-                    StringBuilder appendData = new StringBuilder();
-                    string LocationData = "";
-                    int c = 0;
-                    bool flag = false;
                     string response = "";
                     sw.AutoFlush = true;
                     switch (protocol)
@@ -157,7 +153,7 @@ namespace location
                                 }
                                 else
                                 {
-                                    Console.WriteLine(username + " is " + LocationData);
+                                    Console.WriteLine(username + " is " + location);
                                     break;
                                 }
                             }
@@ -187,8 +183,6 @@ namespace location
                                 }
                                 response = appendLine.ToString();
                                 location = input;
-                                response = appendLine.ToString();
-                                LocationData = appendData.ToString();
                                 if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
@@ -196,7 +190,7 @@ namespace location
                                 }
                                 else
                                 {
-                                    Console.WriteLine(username + " is " + LocationData);
+                                    Console.WriteLine(username + " is " + location);
                                     break;
                                 }
                             }
