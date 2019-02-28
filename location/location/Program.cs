@@ -27,7 +27,6 @@ namespace location
                     string protocol = "whois";
                     string username = null;
                     string location = null;
-                    string input = "";
                     for (int i = 0; i < args.Length; i++)
                     {
                         switch (args[i])
@@ -65,7 +64,9 @@ namespace location
                     StreamWriter sw = new StreamWriter(client.GetStream());
                     StreamReader sr = new StreamReader(client.GetStream());
                     StringBuilder appendLine = new StringBuilder();
+                    StringBuilder appendData = new StringBuilder();
                     string response = "";
+                    int c= 0;
                     sw.AutoFlush = true;
                     switch (protocol)
                     {
@@ -107,11 +108,18 @@ namespace location
                                 sw.Write("GET /" + username + "\r\n");
                                 while (sr.Peek() >= 0)
                                 {
-                                    input = sr.ReadLine();
-                                    appendLine.Append(input);
+                                    c++;
+                                    if (c <= 3)
+                                    {
+                                        appendLine.Append(sr.ReadLine());
+                                    }
+                                    else
+                                    {
+                                        appendData.Append(sr.ReadLine());
+                                    }
                                 }
                                 response = appendLine.ToString();
-                                location = input;
+                                location = appendData.ToString();
                                 if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
@@ -140,12 +148,20 @@ namespace location
                             {
                                 sw.Write("GET /?" + username + " HTTP/1.0" + "\r\n" + "\r\n");
                                 while (sr.Peek() >= 0)
-                                {
-                                    input = sr.ReadLine();
-                                    appendLine.Append(input);
-                                }
+                                    while (sr.Peek() >= 0)
+                                    {
+                                        c++;
+                                        if (c <= 3)
+                                        {
+                                            appendLine.Append(sr.ReadLine());
+                                        }
+                                        else
+                                        {
+                                            appendData.Append(sr.ReadLine());
+                                        }
+                                    }
                                 response = appendLine.ToString();
-                                location = input;
+                                location = appendData.ToString();
                                 if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
@@ -178,11 +194,18 @@ namespace location
                                 sw.Write("GET /?name=" + username + " HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "\r\n");
                                 while (sr.Peek() >= 0)
                                 {
-                                    input = sr.ReadLine();
-                                    appendLine.Append(input);
+                                    c++;
+                                    if (c <= 3)
+                                    {
+                                        appendLine.Append(sr.ReadLine());
+                                    }
+                                    else
+                                    {
+                                        appendData.Append(sr.ReadLine());
+                                    }
                                 }
                                 response = appendLine.ToString();
-                                location = input;
+                                location = appendData.ToString();
                                 if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
