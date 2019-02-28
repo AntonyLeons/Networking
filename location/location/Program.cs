@@ -142,7 +142,8 @@ namespace location
                             }
                             else if (clean.Count == 2)
                             {
-                                sw.Write("POST /" + clean[0] + " HTTP/1.0" + "\r\n" + "Content-Length: " + clean[1].Length + "\r\n" + "\r\n" + clean[1]);
+                                string message = "POST /" + clean[0] + " HTTP/1.0" + "\r\n" + "Content-Length: " + clean[1].Length + "\r\n" + "\r\n" + clean[1];
+                                sw.Write(message);
                                 while (sr.Peek() >= 0)
                                 {
                                     appendLine.Append(sr.ReadLine());
