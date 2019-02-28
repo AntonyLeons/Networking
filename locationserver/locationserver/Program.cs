@@ -76,11 +76,12 @@ namespace locationserver
                 sw.AutoFlush = true;
 
                 DateTime localDate = DateTime.Now;
-                int c = 0;
+               // int c = 0;
                 string datastring;
                 string locationstring;
                 string userstring;
                 string input = "";
+                string check="";
                 StringBuilder appendLine = new StringBuilder();
                 StringBuilder appendData = new StringBuilder();
                 while (sr.Peek() > -1)
@@ -104,9 +105,11 @@ namespace locationserver
                 string[] Whois = datastring.Split(new char[] { ' ' }, 2);
                 List<string> sections = new List<string>(datastring.Split(' ').ToList());
                 locationstring = lines[lines.Count - 1];
-
-
-                if (sections[0] == ("GET"))
+                if (sections.Count >= 2)
+                {
+                    check = sections[1];
+                }
+                if (sections[0] == ("GET")&& check.StartsWith("/"))
                 {
                     if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1")) //h9
                     {
@@ -160,7 +163,7 @@ namespace locationserver
                         }
                     }
                 }
-                else if (sections[0] == ("PUT"))
+                else if (sections[0] == ("PUT") && check.StartsWith("/")&&lines.Count>=3)
                 {
                     if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1")&& sections.Count>=2) //-h9
                     {
@@ -183,7 +186,7 @@ namespace locationserver
                         }
                     }
                 }
-                else if (sections[0]==("POST"))
+                else if (sections[0]==("POST") && check.StartsWith("/") && lines.Count >= 3)
                 {
                     if (sections.Contains("HTTP/1.0"))
                     {
@@ -228,9 +231,7 @@ namespace locationserver
                         }
                     }
                 }
-                else if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1")) //h9
-                {
-                    if (Whois.Length == 2)
+                else  if (Whois.Length == 2)
                     {
                         if (data.ContainsKey(Whois[0]))
                         {
@@ -260,7 +261,7 @@ namespace locationserver
                         }
                     }
                     else { }
-                }
+                
 
                 log.Add(localDate, logstatement);
                 Console.WriteLine(log.Keys.Last() + " " + log.Values.Last());
