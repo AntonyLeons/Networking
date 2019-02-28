@@ -98,45 +98,14 @@ namespace locationserver
                     }
                 }
                 input = input.Trim();
-                input = input.Replace("\r\n", " ");
-                datastring = input;
+                datastring = input.Replace("\r\n", ",");
+                List<string> lines = new List<string>(datastring.Split(',').ToList());
+                datastring = input.Replace("\r\n", " ");
                 string[] Whois = datastring.Split(new char[] { ' ' }, 2);
                 List<string> sections = new List<string>(datastring.Split(' ').ToList());
-                locationstring = sections[sections.Count - 1];
+                locationstring = lines[lines.Count - 1];
 
-                //if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1")) //h9
-                //{
-                //    if (Whois.Length == 2)
-                //    {
-                //        if (data.ContainsKey(Whois[0]))
-                //        {
-                //            data[Whois[0]] = Whois[1];
-                //            sw.WriteLine("OK");
-                //            logstatement += "Put " + datastring + " - OK";
-                //        }
-                //        else
-                //        {
-                //            data.Add(Whois[0], Whois[1]);
-                //            sw.WriteLine("OK");
-                //            logstatement += "Put " + datastring + " - OK";
-                //        }
-                //    }
-                //    else if (Whois.Length == 1)
-                //    {
 
-                //        if (data.ContainsKey(Whois[0]))
-                //        {
-                //            sw.WriteLine(data[Whois[0]]);
-                //            logstatement += "GET " + datastring + " - OK";
-                //        }
-                //        else
-                //        {
-                //            sw.WriteLine("ERROR: no entries found");
-                //            logstatement += "GET " + datastring + " ERROR: no entries found";
-                //        }
-                //    }
-                //    else { }
-                //}
                 if (sections[0] == ("GET"))
                 {
                     if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1")) //h9
@@ -193,7 +162,7 @@ namespace locationserver
                 }
                 else if (sections[0] == ("PUT"))
                 {
-                    if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1") && (sections[0] == "GET" || sections[0] == "PUT")) //-h9
+                    if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1")&& sections.Count>=2) //-h9
                     {
                         sections.RemoveAt(0);
                         userstring = sections[0];
@@ -239,8 +208,8 @@ namespace locationserver
                     {
                         {
                             userstring = locationstring.Remove(0, 5);
-                            userstring=userstring.Replace("&location=", " ");
-                            string[] tmp = userstring.Split(' ');
+                            userstring=userstring.Replace("&location=", ",");
+                            string[] tmp = userstring.Split(',');
                             userstring = tmp[0];
                             locationstring = tmp[1];
 
@@ -258,6 +227,39 @@ namespace locationserver
                             }
                         }
                     }
+                }
+                else if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1")) //h9
+                {
+                    if (Whois.Length == 2)
+                    {
+                        if (data.ContainsKey(Whois[0]))
+                        {
+                            data[Whois[0]] = Whois[1];
+                            sw.WriteLine("OK");
+                            logstatement += "Put " + datastring + " - OK";
+                        }
+                        else
+                        {
+                            data.Add(Whois[0], Whois[1]);
+                            sw.WriteLine("OK");
+                            logstatement += "Put " + datastring + " - OK";
+                        }
+                    }
+                    else if (Whois.Length == 1)
+                    {
+
+                        if (data.ContainsKey(Whois[0]))
+                        {
+                            sw.WriteLine(data[Whois[0]]);
+                            logstatement += "GET " + datastring + " - OK";
+                        }
+                        else
+                        {
+                            sw.WriteLine("ERROR: no entries found");
+                            logstatement += "GET " + datastring + " ERROR: no entries found";
+                        }
+                    }
+                    else { }
                 }
 
                 log.Add(localDate, logstatement);
