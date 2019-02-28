@@ -84,9 +84,9 @@ namespace locationserver
                 
                 while (sr.Peek() >= 0)
                 {
-                    appendData.Clear();
-                    appendData.Append(sr.ReadLine());
-                    appendLine.Append(appendData.ToString() + " ");
+                        appendData.Clear();
+                        appendData.Append(sr.ReadLine());
+                        appendLine.Append(appendData.ToString() + " ");
                 }
                 datastring = appendLine.ToString().Trim();
                 locationstring = appendData.ToString().Trim();
