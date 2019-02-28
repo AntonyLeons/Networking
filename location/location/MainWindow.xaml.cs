@@ -76,7 +76,7 @@ namespace location
                         }
                         else if (Location.Text != "" && User.Text != "")
                         {
-                            sw.Write("PUT /" + User.Text + "\r\n" + "\r\n" + Location.Text + "\r \n");
+                            sw.Write("PUT /" + User.Text + "\r\n" + "\r\n" + Location.Text + "\r\n");
                             while (sr.Peek() >= 0)
                             {
                                 appendLine.Append(sr.ReadLine());
