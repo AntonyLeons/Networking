@@ -76,33 +76,23 @@ namespace locationserver
                 sw.AutoFlush = true;
 
                 DateTime localDate = DateTime.Now;
-               // int c = 0;
                 string datastring;
                 string locationstring;
                 string userstring;
                 string input = "";
                 string check="";
-                StringBuilder appendLine = new StringBuilder();
-                StringBuilder appendData = new StringBuilder();
+                string whoisdata;
+
                 while (sr.Peek() > -1)
                 {
-                    try
-                    {
                         input += (char)sr.Read();
-                        //  appendData.Clear();
-                        // appendData.Append(sr.ReadLine() + " ");
-                        // appendLine.Append(appendData.ToString());
-                    }
-                    catch
-                    {
-                        //     appendData.Append((char)sr.Read());
-                    }
                 }
+                whoisdata = input.TrimEnd('\r', '\n');
+                string[] Whois = whoisdata.Split(new char[] { ' ' }, 2);
                 input = input.Trim();
                 datastring = input.Replace("\r\n", ",");
                 List<string> lines = new List<string>(datastring.Split(',').ToList());
                 datastring = input.Replace("\r\n", " ");
-                string[] Whois = datastring.Split(new char[] { ' ' }, 2);
                 List<string> sections = new List<string>(datastring.Split(' ').ToList());
                 locationstring = lines[lines.Count - 1];
                 if (sections.Count >= 2)
