@@ -61,12 +61,15 @@ namespace location
                     client.Connect(host, port);
                     client.ReceiveTimeout = 1000;
                     client.SendTimeout = 1000;
+                    
                     StreamWriter sw = new StreamWriter(client.GetStream());
                     StreamReader sr = new StreamReader(client.GetStream());
                     StringBuilder appendLine = new StringBuilder();
                     StringBuilder appendData = new StringBuilder();
+                    string datastring;
                     string response = "";
                     int c= 0;
+                    bool html=false;
                     sw.AutoFlush = true;
                     switch (protocol)
                     {
@@ -106,20 +109,28 @@ namespace location
                             if (location == null)
                             {
                                 sw.Write("GET /" + username + "\r\n");
-                                while (sr.Peek() >= 0)
+                                while (sr.Peek() > -1)
                                 {
-                                    c++;
-                                    if (c <= 3)
+                                    response += (char)sr.Read();
+                                }
+                                datastring = response.Replace("\r\n", ",");
+                                List<string> lines = new List<string>(datastring.Split(',').ToList());
+                                for (int i = 2; i < lines.Count; i++)
+                                {
+                                    if (lines[i].StartsWith("<html>"))
                                     {
-                                        appendLine.Append(sr.ReadLine());
+                                        html = true;
+                                        location = "";
+                                    }
+                                    if (html == true)
+                                    {
+                                        location += lines[i] + "\r\n";
                                     }
                                     else
                                     {
-                                        appendData.Append(sr.ReadLine());
+                                        location = lines[3];
                                     }
                                 }
-                                response = appendLine.ToString();
-                                location = appendData.ToString();
                                 if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
@@ -147,21 +158,29 @@ namespace location
                             if (location==null)
                             {
                                 sw.Write("GET /?" + username + " HTTP/1.0" + "\r\n" + "\r\n");
-                                while (sr.Peek() >= 0)
-                                    while (sr.Peek() >= 0)
+                                while (sr.Peek() > -1)
+                                {
+                                    response += (char)sr.Read();
+                                }
+                                datastring = response.Replace("\r\n", ",");
+                                List<string> lines = new List<string>(datastring.Split(',').ToList());
+                                for (int i = 3; i < lines.Count; i++)
+                                {
+                                    if (lines[i].StartsWith("<html>"))
                                     {
-                                        c++;
-                                        if (c <= 3)
-                                        {
-                                            appendLine.Append(sr.ReadLine());
-                                        }
-                                        else
-                                        {
-                                            appendData.Append(sr.ReadLine());
-                                        }
+                                        html = true;
+                                        location = "";
                                     }
-                                response = appendLine.ToString();
-                                location = appendData.ToString();
+                                    if (html == true)
+                                    {
+                                        location += lines[i] + "\r\n";
+                                    }
+                                    else
+                                    {
+                                        location = lines[3];
+                                    }
+                                }
+
                                 if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
@@ -192,20 +211,27 @@ namespace location
                             if (location==null)
                             {
                                 sw.Write("GET /?name=" + username + " HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "\r\n");
-                                while (sr.Peek() >= 0)
+                                while (sr.Peek() > -1)
                                 {
-                                    c++;
-                                    if (c <= 3)
+                                    response += (char)sr.Read();
+                                }
+                                datastring = response.Replace("\r\n", ",");
+                                List<string> lines = new List<string>(datastring.Split(',').ToList());
+                                for (int i = 3; i < lines.Count; i++)
+                                {
+                                    if(lines[i].StartsWith("<html>"))
                                     {
-                                        appendLine.Append(sr.ReadLine());
+                                        html = true;
+                                        location = "";
                                     }
-                                    else
+                                    if (html == true)
                                     {
-                                        appendData.Append(sr.ReadLine());
+                                        location += lines[i] + "\r\n";
+                                    }else
+                                    {
+                                        location = lines[3];
                                     }
                                 }
-                                response = appendLine.ToString();
-                                location = appendData.ToString();
                                 if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
