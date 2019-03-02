@@ -109,28 +109,13 @@ namespace location
                             if (location == null)
                             {
                                 sw.Write("GET /" + username + "\r\n");
-                                while (sr.Peek() > -1)
+                                while (!sr.EndOfStream)
                                 {
                                     response += (char)sr.Read();
                                 }
                                 datastring = response.Replace("\r\n", ",");
                                 List<string> lines = new List<string>(datastring.Split(',').ToList());
-                                for (int i = 2; i < lines.Count; i++)
-                                {
-                                    if (lines[i].StartsWith("<html>"))
-                                    {
-                                        html = true;
-                                        location = "";
-                                    }
-                                    if (html == true)
-                                    {
-                                        location += lines[i] + "\r\n";
-                                    }
-                                    else
-                                    {
-                                        location = lines[3];
-                                    }
-                                }
+                                location = lines[3];
                                 if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
@@ -158,28 +143,13 @@ namespace location
                             if (location==null)
                             {
                                 sw.Write("GET /?" + username + " HTTP/1.0" + "\r\n" + "\r\n");
-                                while (sr.Peek() > -1)
+                                while (!sr.EndOfStream)
                                 {
                                     response += (char)sr.Read();
                                 }
                                 datastring = response.Replace("\r\n", ",");
                                 List<string> lines = new List<string>(datastring.Split(',').ToList());
-                                for (int i = 3; i < lines.Count; i++)
-                                {
-                                    if (lines[i].StartsWith("<html>"))
-                                    {
-                                        html = true;
-                                        location = "";
-                                    }
-                                    if (html == true)
-                                    {
-                                        location += lines[i] + "\r\n";
-                                    }
-                                    else
-                                    {
-                                        location = lines[3];
-                                    }
-                                }
+                                location = lines[3];
 
                                 if (response.Contains("404 Not Found"))
                                 {
@@ -211,7 +181,8 @@ namespace location
                             if (location==null)
                             {
                                 sw.Write("GET /?name=" + username + " HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "\r\n");
-                                while (sr.Peek() > -1)
+                                System.Threading.Thread.Sleep(100);
+                                while (sr.Peek() >= 0)
                                 {
                                     response += (char)sr.Read();
                                 }
