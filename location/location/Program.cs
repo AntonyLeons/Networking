@@ -142,7 +142,7 @@ namespace location
                             }
                             else 
                             {
-                                sw.Write("PUT /" + username + "\r\n" + "\r\n" + location + "\r \n");
+                                sw.Write("PUT /" + username + "\r\n" + "\r\n" + location + "\r\n");
                                 while (sr.Peek() >= 0)
                                 {
                                     appendLine.Append(sr.ReadLine());
