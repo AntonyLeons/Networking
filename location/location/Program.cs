@@ -116,7 +116,7 @@ namespace location
                                 datastring = response.Replace("\r\n", ",");
                                 List<string> lines = new List<string>(datastring.Split(',').ToList());
                                 location = lines[3];
-                                if (response.Contains("404 Not Found"))
+                                if (lines[0].Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
                                 }
@@ -151,7 +151,7 @@ namespace location
                                 List<string> lines = new List<string>(datastring.Split(',').ToList());
                                 location = lines[3];
 
-                                if (response.Contains("404 Not Found"))
+                                if (lines[0].Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
                                     break;
@@ -203,7 +203,7 @@ namespace location
                                         location = lines[3];
                                     }
                                 }
-                                if (response.Contains("404 Not Found"))
+                                if (lines[0].Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
                                     break;
