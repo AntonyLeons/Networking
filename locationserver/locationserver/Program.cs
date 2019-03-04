@@ -120,9 +120,9 @@ namespace locationserver
                             userstring = sections[0];
                             userstring = userstring.Remove(0, 1);
 
-                            if (data.ContainsKey(userstring))
+                            if (data.TryGetValue(userstring, out locationstring))
                             {
-                                sw.WriteLine("HTTP/0.9 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n"); ///location OK 3
+                                sw.WriteLine("HTTP/0.9 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + locationstring + "\r\n"); ///location OK 3
                              //  logstatement += "GET " + datastring + " - OK";
                             }
                             else
@@ -137,9 +137,9 @@ namespace locationserver
                             userstring = sections[0];
                             userstring = userstring.Remove(0, 2);
 
-                            if (data.ContainsKey(userstring))
+                            if (data.TryGetValue(userstring, out locationstring))
                             {
-                                sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n");
+                                sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + locationstring + "\r\n");
                             //    logstatement += "GET " + datastring + " - OK";
                             }
                             else
@@ -154,9 +154,9 @@ namespace locationserver
                             userstring = sections[0];
                             userstring = userstring.Remove(0, 7);
 
-                            if (data.ContainsKey(userstring))
+                            if (data.TryGetValue(userstring, out locationstring))
                             {
-                                sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n"); //location ok responce 3
+                                sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + locationstring + "\r\n"); //location ok responce 3
                               //  logstatement += "GET " + datastring + " - OK";
                             }
                             else
@@ -197,7 +197,7 @@ namespace locationserver
                         {
                             locationstring = sr.ReadLine();
                             locationstring = sr.ReadLine();
-                            while (sr.Peek() >= 0)
+                            while (!sr.EndOfStream)
                             {
                                 locationstring+=(char)sr.Read();
                             }
@@ -224,7 +224,7 @@ namespace locationserver
                                 locationstring = sr.ReadLine();
                                 locationstring = sr.ReadLine();
                                 locationstring = sr.ReadLine();
-                                while (sr.Peek() >= 0)
+                                while (!sr.EndOfStream)
                                 {
                                     locationstring += (char)sr.Read();
                                 }
@@ -267,9 +267,9 @@ namespace locationserver
                     else if (Whois.Length == 1)
                     {
 
-                        if (data.ContainsKey(Whois[0]))
+                        if (data.TryGetValue(Whois[0], out locationstring))
                         {
-                            sw.WriteLine(data[Whois[0]]);
+                            sw.WriteLine(locationstring);
                         //    logstatement += "GET " + datastring + " - OK";
                         }
                         else
