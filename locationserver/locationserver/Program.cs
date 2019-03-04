@@ -88,20 +88,17 @@ namespace locationserver
                     StreamWriter sw = new StreamWriter(socketStream);
                     StreamReader sr = new StreamReader(socketStream);
                     sw.AutoFlush = true;
-                    DateTime localDate = DateTime.Now;
+                   // DateTime localDate = DateTime.Now;
                    // string datastring;
                     string locationstring="";
                     string userstring;
                     string input = "";
                     string check = "";
-                    string whoisdata;
 
                     input = sr.ReadLine();
-                    whoisdata = input;
-                    string[] Whois = whoisdata.Split(new char[] { ' ' }, 2);
+
+                    string[] Whois = input.Split(new char[] { ' ' }, 2);
                     input = input.Trim();
-                    List<string> lines = new List<string>();
-                    lines.Add(input);
                     List<string> sections = new List<string>(input.Split(' '));
                     //   datastring = input.Replace("\r\n", ",");
                     //  List<string> lines = new List<string>(datastring.Split(','));
@@ -197,7 +194,7 @@ namespace locationserver
                         {
                             locationstring = sr.ReadLine();
                             locationstring = sr.ReadLine();
-                            while (!sr.EndOfStream)
+                            while (sr.Peek() >= 0)
                             {
                                 locationstring+=(char)sr.Read();
                             }
@@ -224,7 +221,7 @@ namespace locationserver
                                 locationstring = sr.ReadLine();
                                 locationstring = sr.ReadLine();
                                 locationstring = sr.ReadLine();
-                                while (!sr.EndOfStream)
+                                while (sr.Peek() >= 0)
                                 {
                                     locationstring += (char)sr.Read();
                                 }
