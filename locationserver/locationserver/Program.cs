@@ -119,12 +119,12 @@ namespace locationserver
 
                             if (data.TryGetValue(userstring, out locationstring))
                             {
-                                sw.WriteLine("HTTP/0.9 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + locationstring + "\r\n"); ///location OK 3
+                                sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); ///location OK 3
                              //  logstatement += "GET " + datastring + " - OK";
                             }
                             else
                             {
-                                sw.WriteLine("HTTP/0.9 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
+                                sw.WriteLine("HTTP/0.9 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
                           //      logstatement += "GET " + datastring + " ERROR: no entries found";
                             }
                         }
@@ -136,12 +136,12 @@ namespace locationserver
 
                             if (data.TryGetValue(userstring, out locationstring))
                             {
-                                sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + locationstring + "\r\n");
+                                sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n");
                             //    logstatement += "GET " + datastring + " - OK";
                             }
                             else
                             {
-                                sw.WriteLine("HTTP/1.0 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
+                                sw.WriteLine("HTTP/1.0 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
                              //   logstatement += "GET " + datastring + " ERROR: no entries found";
                             }
                         }
@@ -153,12 +153,12 @@ namespace locationserver
 
                             if (data.TryGetValue(userstring, out locationstring))
                             {
-                                sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + locationstring + "\r\n"); //location ok responce 3
+                                sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); //location ok responce 3
                               //  logstatement += "GET " + datastring + " - OK";
                             }
                             else
                             {
-                                sw.WriteLine("HTTP/1.1 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
+                                sw.WriteLine("HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
                                // logstatement += "GET " + datastring + " ERROR: no entries found";
                             }
                         }
@@ -177,13 +177,13 @@ namespace locationserver
                             if (data.ContainsKey(userstring))
                             {
                                 data[userstring] = locationstring;
-                                sw.WriteLine("HTTP/0.9 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
+                                sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
                             //    logstatement += "Put " + datastring + " - OK";
                             }
                             else
                             {
                                 data.Add(userstring, locationstring);
-                                sw.WriteLine("HTTP/0.9 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
+                                sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
                             //    logstatement += "Put " + datastring + " - OK";
                             }
                         }
@@ -205,13 +205,13 @@ namespace locationserver
                             if (data.ContainsKey(userstring))
                             {
                                 data[userstring] = locationstring;
-                                sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + "\r\n"); ///location added (put) responce 5
+                                sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
                               //  logstatement += "Put " + datastring + " - OK";
                             }
                             else
                             {
                                 data.Add(userstring, locationstring);
-                                sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + "\r\n"); ///location added (put) responce 5
+                                sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
                                // logstatement += "Put " + datastring + " - OK";
                             }
                         }
@@ -234,13 +234,13 @@ namespace locationserver
                                 if (data.ContainsKey(userstring))
                                 {
                                     data[userstring] = locationstring;
-                                    sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
+                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
                                   //  logstatement += "Put " + datastring + " - OK";
                                 }
                                 else
                                 {
                                     data.Add(userstring, locationstring);
-                                    sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
+                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
                                   // logstatement += "Put " + datastring + " - OK";
                                 }
                             }
