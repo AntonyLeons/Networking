@@ -4,3 +4,6 @@
 *.cache
 *.ide-shm
 locationserver/.vs/locationserver/v15/.suo
+location/.vs/location/DesignTimeBuild/.dtbcache
+location/.vs/location/v15/Server/sqlite3/storage.ide-wal
+location/.vs/location/v15/Server/sqlite3/storage.ide-shm

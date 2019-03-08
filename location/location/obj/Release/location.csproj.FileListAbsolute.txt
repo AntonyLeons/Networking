@@ -1,0 +1,14 @@
+G:\GitHub\Networking\location\location\bin\Release\location.exe.config
+G:\GitHub\Networking\location\location\bin\Release\location.exe
+G:\GitHub\Networking\location\location\bin\Release\location.pdb
+G:\GitHub\Networking\location\location\obj\Release\MainWindow.g.cs
+G:\GitHub\Networking\location\location\obj\Release\App.g.cs
+G:\GitHub\Networking\location\location\obj\Release\location_MarkupCompile.cache
+G:\GitHub\Networking\location\location\obj\Release\location_MarkupCompile.lref
+G:\GitHub\Networking\location\location\obj\Release\MainWindow.baml
+G:\GitHub\Networking\location\location\obj\Release\location.g.resources
+G:\GitHub\Networking\location\location\obj\Release\location.Properties.Resources.resources
+G:\GitHub\Networking\location\location\obj\Release\location.csproj.GenerateResource.cache
+G:\GitHub\Networking\location\location\obj\Release\location.csproj.CoreCompileInputs.cache
+G:\GitHub\Networking\location\location\obj\Release\location.exe
+G:\GitHub\Networking\location\location\obj\Release\location.pdb

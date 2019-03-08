@@ -4,17 +4,17 @@
 exe
 C#
 .cs
-\\adir.hull.ac.uk\home\554\554538\GitHub\Networking\locationserver\locationserver\obj\Release\
+G:\GitHub\Networking\locationserver\locationserver\obj\Release\
 locationserver
 none
 false
 TRACE
-\\adir.hull.ac.uk\home\554\554538\GitHub\Networking\locationserver\locationserver\App.xaml
+G:\GitHub\Networking\locationserver\locationserver\App.xaml
 11151548125
 
 10-1451743117
 13-1662647192
 MainWindow.xaml;
 
-False
+True
 
