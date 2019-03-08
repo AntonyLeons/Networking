@@ -199,7 +199,7 @@ namespace locationserver
                                 }
                             } //h1
                         }
-                        else if (sections.Count >= 2)
+                        if (sections.Count >= 2)
                         {
                             if (sections[0] == ("GET") && sections[1].StartsWith("/"))
                             {
