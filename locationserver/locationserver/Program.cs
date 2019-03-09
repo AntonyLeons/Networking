@@ -91,6 +91,10 @@ namespace locationserver
                     string locationstring = "";
                     string userstring;
                     string input = "";
+                    bool slash = false;
+                    bool queslash = false;
+                    bool get = false;
+                    bool post = false;
                     int lines = 1;
 
                     input = sr.ReadLine();
@@ -110,14 +114,32 @@ namespace locationserver
                         break;
                     }
                     List<string> sections = new List<string>(input.Split(' '));
+                    if(sections[0]==("GET"))
+                    {
+                        get = true;
+                    }
+                    else if(sections[0]==("POST"))
+                    {
+                        post = true;
+                    }
+                    if (sections.Count >= 2) //check
+                    {
+                        if (sections[1].StartsWith("/"))
+                        {
+                            slash = true;
+                        }
+                        if(sections[1].StartsWith("/?"))
+                        {
+                            queslash = true;
+                        }
+                    }
                     for (int i = 0; i < 1; i++)
                     {
                         if (sections.Count >= 3 && lines >= 2)
                         {
-                            if (sections[0] == ("GET") && sections[2] == ("HTTP/1.0") && sections[1].StartsWith("/?") && lines >= 2)
+                            if (get==true && sections[2] == ("HTTP/1.0") && queslash == true)
                             {
-                                sections.RemoveAt(0);
-                                userstring = sections[0];
+                                userstring = sections[1];
                                 userstring = userstring.Remove(0, 2);
 
                                 if (data.TryGetValue(userstring, out locationstring))
@@ -132,14 +154,13 @@ namespace locationserver
                                     break;
                                 }
                             }
-                            else if (sections[0] == ("POST") && sections[2] == ("HTTP/1.0") && sections[1].StartsWith("/") && lines >= 2)
+                            else if (post==true && sections[2] == ("HTTP/1.0") && slash==true)
                             {
                                 while (sr.Peek() >= 0)
                                 {
                                     locationstring += (char)sr.Read();
                                 }
-                                sections.RemoveAt(0);
-                                userstring = sections[0];
+                                userstring = sections[1];
                                 userstring = userstring.Remove(0, 1);
 
                                 if (data.ContainsKey(userstring))
@@ -155,10 +176,9 @@ namespace locationserver
                                     break;
                                 }
                             } // -h0
-                            else if (sections[0] == ("GET") && sections[2] == ("HTTP/1.1") && sections[1].StartsWith("/?") && lines >= 3)
+                            else if (get==true && sections[2] == ("HTTP/1.1") && queslash==true && lines >= 3)
                             {
-                                sections.RemoveAt(0);
-                                userstring = sections[0];
+                                userstring = sections[1];
                                 userstring = userstring.Remove(0, 7);
 
                                 if (data.TryGetValue(userstring, out locationstring))
@@ -172,7 +192,7 @@ namespace locationserver
                                     break;
                                 }
                             }
-                            else if (sections[0] == ("POST") && sections[2] == ("HTTP/1.1") && sections[1].StartsWith("/") && lines >= 3)
+                            else if (post==true && sections[2] == ("HTTP/1.1") && slash==true && lines >= 3)
                             {
                                 locationstring = sr.ReadLine();
                                 while (sr.Peek() >= 0)
@@ -201,10 +221,9 @@ namespace locationserver
                         }
                         if (sections.Count >= 2)
                         {
-                            if (sections[0] == ("GET") && sections[1].StartsWith("/"))
+                            if (get==true && slash==true)
                             {
-                                sections.RemoveAt(0);
-                                userstring = sections[0];
+                                userstring = sections[1];
                                 userstring = userstring.Remove(0, 1);
 
                                 if (data.TryGetValue(userstring, out locationstring))
@@ -218,11 +237,9 @@ namespace locationserver
                                     break;
                                 }
                             }
-                            else if (sections[0] == ("PUT") && sections[1].StartsWith("/") && lines == 3)
+                            else if (sections[0] == ("PUT") && slash==true && lines == 3)
                             {
-                                sections.RemoveAt(0);
-                                userstring = sections[0];
-                                sections.RemoveAt(0);
+                                userstring = sections[1];
                                 userstring = userstring.Remove(0, 1);
 
                                 if (data.ContainsKey(userstring))
