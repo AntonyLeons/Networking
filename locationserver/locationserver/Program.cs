@@ -300,3 +300,30 @@ namespace locationserver
         }
     }
 }
+public class Logging
+{
+    public static String LogFile = null;
+    public Logging(String filename)
+    {
+        LogFile = filename;
+    }
+
+    private static readonly object locker = new object();
+
+    public void WriteToLog(String message,String host, String Status)
+    {
+        String line =host+" - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'")+ " \"" +message ///35 mins
+        lock (locker)
+        {
+            Console.WriteLine(message);
+            if(LogFile==null)
+            {
+                return;
+            }
+            StreamWriter SW;
+            SW = File.AppendText(LogFile);
+            SW.WriteLine(message);
+            SW.Close();
+        }
+    }
+}
