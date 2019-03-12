@@ -90,7 +90,6 @@ namespace locationserver
                 string State = "";
                 try
                 {
-
                     socketStream.ReadTimeout = timeout;
                     socketStream.WriteTimeout = timeout;
                     StreamWriter sw = new StreamWriter(socketStream);
@@ -154,7 +153,6 @@ namespace locationserver
                                     sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n");
                                     State = "OK";
                                     break;
-
                                 }
                                 else
                                 {
@@ -324,38 +322,41 @@ namespace locationserver
                 }
             }
         }
-    }
-}
-public class Logging
-{
-    public static string LogFile = null;
-    public Logging(string Logpath)
-    {
-        LogFile = Logpath;
-    }
 
-    private static readonly object locker = new object();
 
-    public void WriteToLog(string Host, string input, string State)
-    {
-        string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
-        lock (locker)
+        public class Logging
         {
-            Console.WriteLine(line);
-            if (LogFile == "")
+            public static string LogFile = null;
+            public Logging(string Logpath)
             {
-                return;
+                LogFile = Logpath;
             }
-            try
+
+            private static readonly object locker = new object();
+
+
+            public void WriteToLog(string Host, string input, string State)
             {
-                StreamWriter SW;
-                SW = File.AppendText(LogFile);
-                SW.WriteLine(input);
-                SW.Close();
-            }
-            catch
-            {
-                Console.WriteLine("Unable to Write Log File");
+                string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
+                lock (locker)
+                {
+                    Console.WriteLine(line);
+                    if (LogFile == "")
+                    {
+                        return;
+                    }
+                    try
+                    {
+                        StreamWriter SW;
+                        SW = File.AppendText(LogFile);
+                        SW.WriteLine(input);
+                        SW.Close();
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Unable to Write Log File");
+                    }
+                }
             }
         }
     }
