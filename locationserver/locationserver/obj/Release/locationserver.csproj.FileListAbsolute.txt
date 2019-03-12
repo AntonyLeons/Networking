@@ -16,7 +16,6 @@
 G:\GitHub\Networking\locationserver\locationserver\bin\Release\locationserver.exe.config
 G:\GitHub\Networking\locationserver\locationserver\bin\Release\locationserver.exe
 G:\GitHub\Networking\locationserver\locationserver\bin\Release\locationserver.pdb
-G:\GitHub\Networking\locationserver\locationserver\obj\Release\locationserver.csprojAssemblyReference.cache
 G:\GitHub\Networking\locationserver\locationserver\obj\Release\MainWindow.g.cs
 G:\GitHub\Networking\locationserver\locationserver\obj\Release\App.g.cs
 G:\GitHub\Networking\locationserver\locationserver\obj\Release\locationserver_MarkupCompile.cache
