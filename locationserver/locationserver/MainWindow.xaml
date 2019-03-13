@@ -11,7 +11,7 @@
         <TextBox x:Name="Address" HorizontalAlignment="Left" Height="23" Margin="75,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="237" Text="127.0.0.1"/>
         <Label x:Name="LblPort" Content="Port" HorizontalAlignment="Left" Margin="342,33,0,0" VerticalAlignment="Top" Width="37"/>
         <TextBox x:Name="Port" HorizontalAlignment="Left" Height="23" Margin="403,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="162" Text="43"/>
-        <TextBox x:Name="Status" HorizontalAlignment="Left" Height="247" Margin="27,100,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="732" Background="Black" Foreground="White" VerticalScrollBarVisibility="Auto" TextChanged="Status_TextChanged" IsReadOnly="True" CaretBrush="White"/>
+        <TextBox x:Name="Status" HorizontalAlignment="Left" Height="247" Margin="27,100,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="732" Background="Black" Foreground="White" VerticalScrollBarVisibility="Auto" TextChanged="Status_TextChanged" IsReadOnly="True" CaretBrush="White" x:FieldModifier="public"/>
         <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Margin="591,37,0,0" VerticalAlignment="Top" Width="75" Click="Start_Click"/>
         <Button x:Name="Stop" Content="Stop" HorizontalAlignment="Left" Margin="685,37,0,0" VerticalAlignment="Top" Width="75" Click="Stop_Click" IsEnabled="False"/>
         <TextBox x:Name="Timebox" HorizontalAlignment="Left" Height="23" Margin="75,72,0,0" TextWrapping="Wrap" Text="1000" VerticalAlignment="Top" Width="120"/>

@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace locationserver
 {
@@ -25,12 +17,8 @@ namespace locationserver
     public partial class MainWindow : Window
     {
         static Dictionary<string, string> data = new Dictionary<string, string>();
-
-        public Logging Log { get; private set; }
+        public static Logging Log;
         public short timeout { get; private set; }
-
-
-
         public MainWindow()
         {
             InitializeComponent();
@@ -40,7 +28,9 @@ namespace locationserver
         {
             Start.IsEnabled = false;
             Stop.IsEnabled = true;
+            string logpath = "";
             timeout = short.Parse(Timebox.Text);
+            Log = new Logging(logpath);
             Task taskA = Task.Run(() => RunServer(timeout,Log));
             Status.AppendText("Server Started...");
         }
@@ -55,7 +45,6 @@ namespace locationserver
                 string Logpath="";
                 listener = new TcpListener(IPAddress.Any, 43);
                 listener.Start();
-                Console.WriteLine("server started listening");
                 while (true)
                 {
                     connection = listener.AcceptSocket();
@@ -83,9 +72,10 @@ namespace locationserver
             Status.ScrollToEnd();
         }
 
-        class Handler
+ class Handler
         {
             public short timeout { get; private set; }
+            public string Logging{get; private set; }
             public void doRequest(Socket connection, Logging Log, short timeout)
             {
                 String Host = ((IPEndPoint)connection.RemoteEndPoint).Address.ToString();
@@ -159,7 +149,6 @@ namespace locationserver
                                     sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n");
                                     State = "OK";
                                     break;
-
                                 }
                                 else
                                 {
@@ -324,7 +313,7 @@ namespace locationserver
                 {
                     socketStream.Close();
                     connection.Close();
-                    ///Log.WriteToLog(Host, input, State);
+                    Log.WriteToLog(Host, input, State);
                 }
             }
         }
@@ -338,12 +327,15 @@ namespace locationserver
 
             private static readonly object locker = new object();
 
+            public string Status { get; private set; }
+
             public void WriteToLog(string Host, string input, string State)
             {
                 string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
                 lock (locker)
                 {
-                    Console.WriteLine(line);
+                   Status+=(line + "\n");
+
                     if (LogFile == "")
                     {
                         return;
