@@ -113,8 +113,8 @@ namespace location
                                 {
                                     response += (char)sr.Read();
                                 }
-                                datastring = response.Replace("\r\n", ",");
-                                List<string> lines = new List<string>(datastring.Split(',').ToList());
+                                datastring = response.Replace("\r\n", "ÿ");
+                                List<string> lines = new List<string>(datastring.Split('ÿ').ToList());
                                 location = lines[3];
                                 if (lines[0].Contains("404 Not Found"))
                                 {
@@ -147,8 +147,8 @@ namespace location
                                 {
                                     response += (char)sr.Read();
                                 }
-                                datastring = response.Replace("\r\n", ",");
-                                List<string> lines = new List<string>(datastring.Split(',').ToList());
+                                datastring = response.Replace("\r\n", "ÿ");
+                                List<string> lines = new List<string>(datastring.Split('ÿ').ToList());
                                 location = lines[3];
 
                                 if (lines[0].Contains("404 Not Found"))
@@ -186,8 +186,8 @@ namespace location
                                 {
                                     response += (char)sr.Read();
                                 }
-                                datastring = response.Replace("\r\n", ",");
-                                List<string> lines = new List<string>(datastring.Split(',').ToList());
+                                datastring = response.Replace("\r\n", "ÿ");
+                                List<string> lines = new List<string>(datastring.Split('ÿ').ToList());
                                 for (int i = 3; i < lines.Count; i++)
                                 {
                                     if(lines[i].StartsWith("<html>"))
