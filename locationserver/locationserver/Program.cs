@@ -22,7 +22,6 @@ namespace locationserver
             if (!args.Contains("-w"))
             {
                 string savepath = "";
-                string loadpath = "";
                 string logpath = "";
                 short timeout = 1000;
                 for (int i = 0; i < args.Length; i++)
@@ -30,15 +29,31 @@ namespace locationserver
                     switch (args[i])
                     {
                         case "-l": logpath = args[++i]; break;
-                        case "-d":
-                        case "-f": loadpath = args[++i]; break;
+                        case "-d": break;
+                        case "-f": savepath = args[++i]; break;
                         case "-t": timeout = short.Parse(args[++i]); break;
                         default:
                             Console.WriteLine("Unknown Operation");
                             break;
                     }
                 }
-                Log = new Logging(logpath);
+                if (savepath != null)
+                {
+                    try
+                    {
+                        string[] lines = File.ReadAllLines(savepath);
+                        foreach (string entry in lines)
+                        {
+                            string[] entrysplit = entry.Split();
+                            data.Add(entrysplit[0], entrysplit[1]);
+                        }
+                    }
+                    catch
+                    {
+                        Console.WriteLine("No file found, creating new file");
+                    }
+                }
+                Log = new Logging(logpath,savepath);
                 {
                     RunServer(timeout);
                 }
@@ -326,9 +341,11 @@ namespace locationserver
         public class Logging
         {
             public static string LogFile = null;
-            public Logging(string Logpath)
+            public static string savefile = null;
+            public Logging(string Logpath, string savepath)
             {
                 LogFile = Logpath;
+                savefile = savepath;
             }
 
             private static readonly object locker = new object();
@@ -340,6 +357,26 @@ namespace locationserver
                 lock (locker)
                 {
                     Console.WriteLine(line);
+                    if (savefile == "")
+                    {
+                    }
+                    else
+                    {
+                        try
+                        {
+                            StreamWriter SW;
+                            SW=new StreamWriter (savefile, false);
+                            foreach (var entry in data)
+                                {
+                                    SW.WriteLine(entry.Key + " "+ entry.Value);
+                                }
+                            SW.Close();
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Unable to Write Save File");
+                        }
+                    }
                     if (LogFile == "")
                     {
                         return;
@@ -348,7 +385,7 @@ namespace locationserver
                     {
                         StreamWriter SW;
                         SW = File.AppendText(LogFile);
-                        SW.WriteLine(input);
+                        SW.WriteLine(line);
                         SW.Close();
                     }
                     catch

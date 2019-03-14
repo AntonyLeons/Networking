@@ -22,6 +22,14 @@ namespace locationserver
         public MainWindow()
         {
             InitializeComponent();
+            // string line = "Logging started";
+           //  Thread thread = new Thread(new ThreadStart(UpdateTextBoxThread(line)));
+           //  thread.Start();
+        }
+         public string line;
+        public void UpdateTextBoxThread(string line)
+        {
+            Status.Text += line;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e)
@@ -32,7 +40,7 @@ namespace locationserver
             timeout = short.Parse(Timebox.Text);
             Log = new Logging(logpath);
             Task taskA = Task.Run(() => RunServer(timeout,Log));
-            Status.AppendText("Server Started...");
+            Status.AppendText("Server Started... \n");
         }
         static void RunServer(short timeout, Logging Log)
         {
@@ -64,8 +72,9 @@ namespace locationserver
         {
             Start.IsEnabled = true;
             Stop.IsEnabled = false;
-            
-            Console.WriteLine("Server Stopped");
+            //ct.Cancel();
+            Status.AppendText("Server stopped \n");
+
         }
         public void Status_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -147,13 +156,15 @@ namespace locationserver
                                 if (data.TryGetValue(userstring, out locationstring))
                                 {
                                     sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n");
+                                    input = "GET " + userstring;
                                     State = "OK";
                                     break;
                                 }
                                 else
                                 {
                                     sw.WriteLine("HTTP/1.0 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
-                                    State = "OK";
+                                    input = "GET " + userstring;
+                                    State = "UNKNOWN";
                                     break;
                                 }
                             }
@@ -170,6 +181,7 @@ namespace locationserver
                                 {
                                     data[userstring] = locationstring;
                                     sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " +locationstring;
                                     State = "OK";
                                     break;
                                 }
@@ -177,6 +189,7 @@ namespace locationserver
                                 {
                                     data.Add(userstring, locationstring);
                                     sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
                                 }
@@ -189,13 +202,15 @@ namespace locationserver
                                 if (data.TryGetValue(userstring, out locationstring))
                                 {
                                     sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); //location ok responce 3
+                                    input = "GET " + userstring;
                                     State = "OK";
                                     break;
                                 }
                                 else
                                 {
                                     sw.WriteLine("HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
-                                    State = "OK";
+                                    input = "GET " + userstring;
+                                    State = "UNKNOWN";
                                     break;
                                 }
                             }
@@ -216,6 +231,7 @@ namespace locationserver
                                 {
                                     data[userstring] = locationstring;
                                     sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
                                 }
@@ -223,6 +239,7 @@ namespace locationserver
                                 {
                                     data.Add(userstring, locationstring);
                                     sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
                                 }
@@ -238,13 +255,15 @@ namespace locationserver
                                 if (data.TryGetValue(userstring, out locationstring))
                                 {
                                     sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); ///location OK 3
+                                    input = "GET " + userstring;
                                     State = "OK";
                                     break;
                                 }
                                 else
                                 {
                                     sw.WriteLine("HTTP/0.9 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
-                                    State = "OK";
+                                    input = "GET " + userstring;
+                                    State = "UNKNOWN";
                                     break;
                                 }
                             }
@@ -257,6 +276,7 @@ namespace locationserver
                                 {
                                     data[userstring] = locationstring;
                                     sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
                                 }
@@ -264,6 +284,7 @@ namespace locationserver
                                 {
                                     data.Add(userstring, locationstring);
                                     sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
                                 }
@@ -275,6 +296,7 @@ namespace locationserver
                             {
                                 data[Whois[0]] = Whois[1];
                                 sw.WriteLine("OK");
+                                input = "POST " + Whois[0]+ " "+Whois[1];
                                 State = "OK";
                                 break;
                             }
@@ -282,6 +304,7 @@ namespace locationserver
                             {
                                 data.Add(Whois[0], Whois[1]);
                                 sw.WriteLine("OK");
+                                input = "POST " + Whois[0] + " " + Whois[1];
                                 State = "OK";
                                 break;
                             }
@@ -292,12 +315,14 @@ namespace locationserver
                             if (data.ContainsKey(Whois[0]))
                             {
                                 sw.WriteLine(data[Whois[0]]);
+                                input = "GET " + Whois[0];
                                 State = "OK";
                                 break;
                             }
                             else
                             {
                                 sw.WriteLine("ERROR: no entries found");
+                                input = "GET " + Whois[0];
                                 State = "OK";
                                 break;
                             }
