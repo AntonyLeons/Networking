@@ -14,3 +14,4 @@ locationserver/locationserver/obj/Debug/locationserver.csprojAssemblyReference.c
 *.ide-shm
 *.cache
 *.cache
+*.ide-wal
