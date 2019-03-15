@@ -27,6 +27,8 @@ namespace location
                     string protocol = "whois";
                     string username = null;
                     string location = null;
+                    bool debug = false;
+                    short timeout = 1000;
                     for (int i = 0; i < args.Length; i++)
                     {
                         switch (args[i])
@@ -36,6 +38,8 @@ namespace location
                             case "-h9":
                             case "-h0":
                             case "-h1": protocol = args[i]; break;
+                            case "-d": debug = true; break;
+                            case "-t": timeout = short.Parse(args[++i]); break;
 
                             default:
                                 if (username == null)
@@ -59,8 +63,8 @@ namespace location
                         }
                     
                     client.Connect(host, port);
-                    client.ReceiveTimeout = 1000;
-                    client.SendTimeout = 1000;
+                    client.ReceiveTimeout = timeout;
+                    client.SendTimeout = timeout;
                     
                     StreamWriter sw = new StreamWriter(client.GetStream());
                     StreamReader sr = new StreamReader(client.GetStream());
