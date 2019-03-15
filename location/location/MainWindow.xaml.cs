@@ -32,200 +32,157 @@ namespace location
             try
             {
                 TcpClient client = new TcpClient();
-                client.Connect(Address.Text, Int32.Parse(Port.Text));
+                string username = null;
+                string location = null;
+
+                client.Connect(Address.Text, short.Parse(Port.Text));
                 client.ReceiveTimeout = 1000;
                 client.SendTimeout = 1000;
+
                 StreamWriter sw = new StreamWriter(client.GetStream());
                 StreamReader sr = new StreamReader(client.GetStream());
-                StringBuilder appendLine = new StringBuilder();
-                StringBuilder appendData = new StringBuilder();
-                string LocationData = "";
-                int c = 0;
                 string response = "";
                 sw.AutoFlush = true;
-
-                    if (Http0_9.IsChecked == true)
+                if (Http0_9.IsChecked == true)
+                {
+                    if (Location.Text == "" && User.Text != "")
                     {
-                        if (Location.Text == "" && User.Text != "")
-                        {
-                            sw.Write("GET /" + User.Text + "\r\n");
-
-                            while (sr.Peek() >= 0)
-                            {
-                            c++;
-                            if (c <= 3)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            else
-                            {
-                                appendData.Append(sr.ReadLine());
-                            }
-                            }
-                            response = appendLine.ToString();
-                            LocationData = appendData.ToString();
-                            if (response.Contains("404 Not Found"))
-                            {
-                                Status.AppendText(response + "\n");
-                            }
-                            else
-                            {
-                                Status.AppendText(User.Text + " is " + LocationData + "\n");
-                            }
-                        }
-                        else if (Location.Text != "" && User.Text != "")
-                        {
-                            sw.Write("PUT /" + User.Text + "\r\n" + "\r\n" + Location.Text + "\r \n");
-                            while (sr.Peek() >= 0)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            response = appendLine.ToString();
-                            if (response.Contains("OK"))
-                            {
-                                Status.AppendText(User.Text + " location changed to be " + Location.Text + "\n");
-                            }
-                        }
-                        else
-                        {
-                            Status.AppendText("Invalid arguments provided \n");
-                        }
-                    }
-                    else if (Http1_0.IsChecked == true) 
-                    {
-                        
-                        if (Location.Text == "" && User.Text != "")
-                        {
-                            sw.Write("GET /?" + User.Text + " HTTP/1.0" + "\r\n" + "\r\n");
-                            while (sr.Peek() >= 0)
-                        {
-                            c++;
-                            if (c <= 3)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            else
-                            {
-                                appendData.Append(sr.ReadLine());
-                            }
-                        }
-                        response = appendLine.ToString();
-                        LocationData = appendData.ToString();
+                        sw.Write("GET /" + User.Text + "\r\n");
+                        response = sr.ReadLine();
+                        sr.ReadLine();
+                        string OH = sr.ReadLine();
+                        location = sr.ReadLine();
                         if (response.Contains("404 Not Found"))
                         {
-                            Status.AppendText(response + "\n");
+                            Status.AppendText(response);
                         }
                         else
                         {
-                            Status.AppendText(User.Text + " is " + LocationData + "\n");
+                            Status.AppendText(User.Text + " is " + location + "\n");
                         }
                     }
-                        else if (Location.Text != "" && User.Text != "")
-                        {
-                            sw.Write("POST /" + User.Text + " HTTP/1.0" + "\r\n" + "Content-Length: " + Location.Text.Length + "\r\n" + "\r\n" + Location.Text);
-                            while (sr.Peek() >= 0)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            response = appendLine.ToString();
-                            if (response.Contains("OK"))
-                            {
-                                Status.AppendText(User.Text + " location changed to be " + Location.Text + "\n");
-                            }
-                        }
-                        else
-                        {
-                            Status.AppendText("Invalid arguments provided \n");
-                        }
-                    }
-                    else if (Http1_1.IsChecked == true)
+                    else if (Location.Text != "" && User.Text != "")
                     {
-                        
-                        if (Location.Text == "" && User.Text != "")
+                        sw.Write("PUT /" + User.Text + "\r\n" + "\r\n" + Location.Text + "\r\n");
+                        response = sr.ReadLine();
+                        if (response.Contains("OK"))
                         {
-                            sw.Write("GET /?name=" + User.Text + " HTTP/1.1" + "\r\n" + "Host: " + Address.Text + "\r\n" + "\r\n");
-                            while (sr.Peek() >= 0)
-                        {
-                            c++;
-                            if (c <= 3)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            else
-                            {
-                                appendData.Append(sr.ReadLine());
-                            }
-                        }
-                        response = appendLine.ToString();
-                        LocationData = appendData.ToString();
-                        if (response.Contains("404 Not Found"))
-                        {
-                            Status.AppendText(response + "\n");
-                        }
-                        else
-                        {
-                            Status.AppendText(User.Text + " is " + LocationData + "\n");
+                            Status.AppendText(User.Text + " location changed to be " + Location.Text + "\n");
                         }
                     }
-                        else if (Location.Text != "" && User.Text != "")
-                        {
-                            int length = User.Text.Length + Location.Text.Length + 15;
-                            sw.Write("POST / " + "HTTP/1.1" + "\r\n" + "Host: " + Address.Text + "\r\n" + "Content-Length: " + length + "\r\n" + "\r\n" + "name=" + User.Text + "&location=" + Location.Text);
-                            while (sr.Peek() >= 0)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            response = appendLine.ToString();
-                            if (response.Contains("OK"))
-                            {
-                                Status.AppendText(User.Text + " location changed to be " + Location.Text + "\n");
-                            }
-                        }
-                        else
-                        {
-                            Status.AppendText("Invalid arguments provided \n");
-                            
-                        }
-                    }
-                    else if (Whois.IsChecked ==true)
+                    else
                     {
-                        if (Location.Text == "" && User.Text != "")
-                        {
-                            sw.WriteLine(User.Text);
-                            while (sr.Peek() >= 0)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            response = appendLine.ToString();
-                            if (response.Contains("ERROR: no entries found"))
-                            {
-                                Status.AppendText(response + "\n");
-                            }
-                            else
-                            {
-                                Status.AppendText(User.Text + " is " + response + "\n");
-                            }
-                        }
-                        else if (Location.Text != "" && User.Text != "")
-                        {
-                            sw.WriteLine(User.Text + " " + Location.Text);
-                            while (sr.Peek() >= 0)
-                            {
-                                appendLine.Append(sr.ReadLine());
-                            }
-                            response = appendLine.ToString();
-                            if (response.Contains("OK"))
-                            {
-                                Status.AppendText(User.Text + " location changed to be " + Location.Text + "\n");
-                            }
-                        }
-                        else
-                        {
-                            Status.AppendText("Invalid arguments provided \n");
-                        }
+                        Status.AppendText("Invalid arguments provided \n");
                     }
                 }
-            
+                else if (Http1_0.IsChecked == true)
+                {
+                    if (Location.Text == "" && User.Text != "")
+                    {
+                        sw.Write("GET /?" + User.Text + " HTTP/1.0" + "\r\n" + "\r\n");
+                        response = sr.ReadLine();
+                        sr.ReadLine();
+                        string OH = sr.ReadLine();
+                        location = sr.ReadLine();
+
+                        if (response.Contains("404 Not Found"))
+                        {
+                            Status.AppendText(response+ "\n");
+                        }
+                        else
+                        {
+                            Status.AppendText(User.Text + " is " + location + "\n");
+                        }
+                    }
+                    else if (Location.Text != "" && User.Text != "")
+                    {
+                        sw.Write("POST /" + User.Text + " HTTP/1.0" + "\r\n" + "Content-Length: " + Location.Text.Length + "\r\n" + "\r\n" + Location.Text);
+                        response = sr.ReadLine();
+                        if (response.Contains("OK"))
+                        {
+                            Status.AppendText(User.Text + " location changed to be " + Location.Text + "\n");
+                        }
+                    }
+                    else
+                    {
+                        Status.AppendText("Invalid arguments provided \n");
+                    }
+
+                }
+
+                else if (Http1_1.IsChecked == true)
+                {
+
+                    if (Location.Text == "" && User.Text != "")
+                    {
+                        sw.Write("GET /?name=" + User.Text + " HTTP/1.1" + "\r\n" + "Host: " + Address.Text + "\r\n" + "\r\n");
+                        response = sr.ReadLine();
+                        sr.ReadLine();
+                        string OH = sr.ReadLine();
+                        while (OH != "")
+                        {
+                            OH = sr.ReadLine();
+                        }
+                        location = sr.ReadLine() + "\r\n";
+                        while (sr.Peek() >= 0)
+                        {
+                            location += sr.ReadLine() + "\r\n";
+                        }
+
+                        if (response.Contains("404 Not Found"))
+                        {
+                            Status.AppendText(response + "\n");
+                        }
+                        else
+                        {
+                            Status.AppendText(User.Text + " is " + location);
+                        }
+                    }
+                    else if (Location.Text != "" && User.Text != "")
+                    {
+                        int length = User.Text.Length + Location.Text.Length + 15;
+                        sw.Write("POST / " + "HTTP/1.1" + "\r\n" + "Host: " + Address.Text + "\r\n" + "Content-Length: " + length + "\r\n" + "\r\n" + "name=" + User.Text + "&location=" + Location.Text);
+                        response = sr.ReadLine();
+                        if (response.Contains("OK"))
+                        {
+                            Status.AppendText(User.Text + " location changed to be " + Location.Text + "\n");
+                        }
+                    }
+                    else
+                    {
+                        Status.AppendText("Invalid arguments provided \n");
+                    }
+                }
+                else if (Whois.IsChecked == true)
+                {
+                    if (Location.Text == "" && User.Text != "")
+                    {
+                        sw.WriteLine(User.Text);
+                        response = sr.ReadLine();
+                        if (response.Contains("ERROR: no entries found"))
+                        {
+                            Status.AppendText(response + "\n");
+                        }
+                        else
+                        {
+                            Status.AppendText(User.Text + " is " + response + "\n");
+                        }
+                    }
+                    else if (Location.Text != "" && User.Text != "")
+                    {
+                        sw.WriteLine(User.Text + " " + Location.Text);
+                        response = sr.ReadLine();
+                        if (response.Contains("OK"))
+                        {
+                            Status.AppendText(User.Text + " location changed to be " + Location.Text + "\n");
+                        }
+                    }
+                    else
+                    {
+                        Status.AppendText("Invalid arguments provided \n");
+                    }
+                }
+            }
 
             catch (Exception x)
             {

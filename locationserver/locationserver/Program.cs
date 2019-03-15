@@ -5,31 +5,61 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace locationserver
 {
-    class Program
+    public class Program
     {
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         static extern bool FreeConsole();
-        static Dictionary<DateTime, string> log = new Dictionary<DateTime, string>();
         static Dictionary<string, string> data = new Dictionary<string, string>();
-        static string logstatement = "";
+        public static Logging Log;
         [STAThread]
-        public static int Main(string[] args)
+        static int Main(string[] args)
         {
-            if (args != null && args.Length > 0)
+
+            if (!args.Contains("-w"))
             {
-                try
+                string savepath = "";
+                string logpath = "";
+                short timeout = 1000;
+                bool debug = false;
+
+                for (int i = 0; i < args.Length; i++)
                 {
-                    RunServer();
+                    switch (args[i])
+                    {
+                        case "-l": logpath = args[++i]; break;
+                        case "-d": debug = true;  break;
+                        case "-f": savepath = args[++i]; break;
+                        case "-t": timeout = short.Parse(args[++i]); break;
+                        default:
+                            Console.WriteLine("Unknown Operation");
+                            break;
+                    }
+                }
+                if (savepath != null)
+                {
+                    try
+                    {
+                        string[] lines = File.ReadAllLines(savepath);
+                        foreach (string entry in lines)
+                        {
+                            string[] entrysplit = entry.Split();
+                            data.Add(entrysplit[0], entrysplit[1]);
+                        }
+                    }
+                    catch
+                    {
+                        Console.WriteLine("No file found, creating new file");
+                    }
+                }
+                Log = new Logging(logpath,savepath);
+                {
+                    RunServer(timeout,debug);
                 }
 
-                catch
-                {
-                }
                 return 0;
             }
             else
@@ -39,11 +69,12 @@ namespace locationserver
                 return app.Run();
             }
         }
-        static void RunServer()
+        static void RunServer(short timeout,bool debug)
         {
             TcpListener listener;
             Socket connection;
-            NetworkStream socketStream;
+
+            Handler RequestHandler;
             try
             {
                 listener = new TcpListener(IPAddress.Any, 43);
@@ -52,205 +83,367 @@ namespace locationserver
                 while (true)
                 {
                     connection = listener.AcceptSocket();
-                    socketStream = new NetworkStream(connection);
-                    logstatement += "- " + IPAddress.Parse(((IPEndPoint)listener.LocalEndpoint).Address.ToString()) + " - ";
+                    RequestHandler = new Handler();
+
+                    Thread t = new Thread(() => RequestHandler.doRequest(connection, Log, timeout, debug));
+                    t.Start();
                     //Console.WriteLine("Connection Recieved");
-                    doRequest(socketStream);
-                    socketStream.Close();
-                    connection.Close();
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception:" + e.ToString());
+                if (debug == true)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+                else
+                {
+                    Console.WriteLine("Server failed");
+                }
             }
         }
-        static void doRequest(NetworkStream socketStream)
+        class Handler
         {
-            try
+
+
+            public void doRequest(Socket connection, Logging Log, short timeout,bool debug)
             {
-                socketStream.ReadTimeout = 1000;
-                socketStream.WriteTimeout = 1000;
-                StreamWriter sw = new StreamWriter(socketStream);
-                StreamReader sr = new StreamReader(socketStream);
-                sw.AutoFlush = true;
-
-                DateTime localDate = DateTime.Now;
-                string datastring;
-                string locationstring;
-                string userstring;
-                StringBuilder appendLine = new StringBuilder();
-                StringBuilder appendData = new StringBuilder();
-                
-                while (sr.Peek() >= 0)
+                String Host = ((IPEndPoint)connection.RemoteEndPoint).Address.ToString();
+                NetworkStream socketStream;
+                socketStream = new NetworkStream(connection);
+                string input = "";
+                string State = "";
+                try
                 {
-                        appendData.Clear();
-                        appendData.Append(sr.ReadLine());
-                        appendLine.Append(appendData.ToString() + " ");
+                    socketStream.ReadTimeout = timeout;
+                    socketStream.WriteTimeout = timeout;
+                    StreamWriter sw = new StreamWriter(socketStream);
+                    StreamReader sr = new StreamReader(socketStream);
+                    sw.AutoFlush = true;
+                    string locationstring = "";
+                    string userstring;
+                    bool slash = false;
+                    bool queslash = false;
+                    bool get = false;
+                    bool post = false;
+                    int lines = 1;
+
+                    input = sr.ReadLine();
+
+                    string[] Whois = input.Split(new char[] { ' ' }, 2);
+                    input = input.Trim();
+                    while (sr.Peek() >= 0)
+                    {
+                        sr.ReadLine();
+                        lines++;
+                        break;
+                    }
+                    while (sr.Peek() >= 0)
+                    {
+                        locationstring = sr.ReadLine();
+                        lines++;
+                        break;
+                    }
+                    List<string> sections = new List<string>(input.Split(' '));
+                    if (sections[0] == ("GET"))
+                    {
+                        get = true;
+                    }
+                    else if (sections[0] == ("POST"))
+                    {
+                        post = true;
+                    }
+                    if (sections.Count >= 2) //check
+                    {
+                        if (sections[1].StartsWith("/"))
+                        {
+                            slash = true;
+                        }
+                        if (sections[1].StartsWith("/?"))
+                        {
+                            queslash = true;
+                        }
+                    }
+                    for (int i = 0; i < 1; i++)
+                    {
+                        if (sections.Count >= 3 && lines >= 2)
+                        {
+                            if (get == true && sections[2] == ("HTTP/1.0") && queslash == true)
+                            {
+                                userstring = sections[1];
+                                userstring = userstring.Remove(0, 2);
+
+                                if (data.TryGetValue(userstring, out locationstring))
+                                {
+                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n");
+                                    input = "GET " + userstring;
+                                    State = "OK";
+                                    break;
+                                }
+                                else
+                                {
+                                    sw.WriteLine("HTTP/1.0 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
+                                    input = "GET " + userstring;
+                                    State = "UNKNOWN";
+                                    break;
+                                }
+                            }
+                            else if (post == true && sections[2] == ("HTTP/1.0") && slash == true)
+                            {
+                                while (sr.Peek() >= 0)
+                                {
+                                    locationstring += (char)sr.Read();
+                                }
+                                locationstring = locationstring.Replace("\r\n", "");
+                                userstring = sections[1];
+                                userstring = userstring.Remove(0, 1);
+
+                                if (data.ContainsKey(userstring))
+                                {
+                                    data[userstring] = locationstring;
+                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
+                                    State = "OK";
+                                    break;
+                                }
+                                else
+                                {
+                                    data.Add(userstring, locationstring);
+                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
+                                    State = "OK";
+                                    break;
+                                }
+                            } // -h0
+                            else if (get == true && sections[2] == ("HTTP/1.1") && queslash == true && lines >= 3)
+                            {
+                                userstring = sections[1];
+                                userstring = userstring.Remove(0, 7);
+
+                                if (data.TryGetValue(userstring, out locationstring))
+                                {
+                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); //location ok responce 3
+                                    input = "GET " + userstring;
+                                    State = "OK";
+                                    break;
+                                }
+                                else
+                                {
+                                    sw.WriteLine("HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
+                                    input = "GET " + userstring;
+                                    State = "UNKNOWN";
+                                    break;
+                                }
+                            }
+                            else if (post == true && sections[2] == ("HTTP/1.1") && slash == true && lines >= 3)
+                            {
+                                locationstring = sr.ReadLine();
+                                while (sr.Peek() >= 0)
+                                {
+                                    locationstring += (char)sr.Read();
+                                }
+                                userstring = locationstring.Remove(0, 5);
+                                userstring = userstring.Replace("&location=", "ÿ");
+                                string[] tmp = userstring.Split('ÿ');
+                                userstring = tmp[0];
+                                locationstring = tmp[1];
+                                locationstring = locationstring.Replace("\r\n", "");
+
+                                if (data.ContainsKey(userstring))
+                                {
+                                    data[userstring] = locationstring;
+                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
+                                    State = "OK";
+                                    break;
+                                }
+                                else
+                                {
+                                    data.Add(userstring, locationstring);
+                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
+                                    State = "OK";
+                                    break;
+                                }
+                            } //h1
+                        }
+                        if (sections.Count >= 2)
+                        {
+                            if (get == true && slash == true)
+                            {
+                                userstring = sections[1];
+                                userstring = userstring.Remove(0, 1);
+
+                                if (data.TryGetValue(userstring, out locationstring))
+                                {
+                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); ///location OK 3
+                                    input = "GET " + userstring;
+                                    State = "OK";
+                                    break;
+                                }
+                                else
+                                {
+                                    sw.WriteLine("HTTP/0.9 404 Not Found\r\nContent-Type: text/plain\r\n\r\n"); /// location 404 responce 4
+                                    input = "GET " + userstring;
+                                    State = "UNKNOWN";
+                                    break;
+                                }
+                            }
+                            else if (sections[0] == ("PUT") && slash == true && lines == 3)
+                            {
+                                userstring = sections[1];
+                                userstring = userstring.Remove(0, 1);
+
+                                if (data.ContainsKey(userstring))
+                                {
+                                    data[userstring] = locationstring;
+                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
+                                    State = "OK";
+                                    break;
+                                }
+                                else
+                                {
+                                    data.Add(userstring, locationstring);
+                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    input = "POST " + userstring + " " + locationstring;
+                                    State = "OK";
+                                    break;
+                                }
+                            }
+                        }
+                        if (Whois.Length == 2)
+                        {
+                            if (data.ContainsKey(Whois[0]))
+                            {
+                                data[Whois[0]] = Whois[1];
+                                sw.WriteLine("OK");
+                                input = "POST " + Whois[0] + " " + Whois[1];
+                                State = "OK";
+                                break;
+                            }
+                            else
+                            {
+                                data.Add(Whois[0], Whois[1]);
+                                sw.WriteLine("OK");
+                                input = "POST " + Whois[0] + " " + Whois[1];
+                                State = "OK";
+                                break;
+                            }
+                        }
+                        if (Whois.Length == 1)
+                        {
+
+                            if (data.TryGetValue(Whois[0], out locationstring))
+                            {
+                                sw.WriteLine(locationstring);
+                                input = "GET " + Whois[0];
+                                State = "OK";
+                                break;
+                            }
+                            else
+                            {
+                                sw.WriteLine("ERROR: no entries found");
+                                input = "GET " + Whois[0];
+                                State = "UNKNOWN";
+                                break;
+                            }
+                        }
+                    }
                 }
-                datastring = appendLine.ToString().Trim();
-                locationstring = appendData.ToString().Trim();
-                string[] Whois = datastring.Split(new char[] { ' ' }, 2);
-                List<string> sections = new List<string>(datastring.Split(' ').ToList());
-
-                if (!sections.Contains("HTTP/1.0") && !sections.Contains("HTTP/1.1") && (sections[0] == "GET" || sections[0] == "PUT")) //-h9
+                catch (Exception x)
                 {
-                    if (sections[0] == ("GET"))
+                    if (debug == true)
                     {
-                        sections.RemoveAt(0);
-                        userstring = sections[0];
-                        userstring = userstring.Remove(0, 1);
-
-                        if (data.ContainsKey(userstring))
-                        {
-                            sw.WriteLine("HTTP/0.9 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n"); ///location OK 3
-                            logstatement += "GET " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            sw.WriteLine("HTTP/0.9 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
-                            logstatement += "GET " + datastring + " ERROR: no entries found";
-                        }
-                    }
-                    if (sections[0] == ("PUT"))
-                    {
-                        sections.RemoveAt(0);
-                        userstring = sections[0];
-                        sections.RemoveAt(0);
-                        userstring = userstring.Remove(0, 1);
-
-                        if (data.ContainsKey(userstring))
-                        {
-                            data[userstring] = locationstring;
-                            sw.WriteLine("HTTP/0.9 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
-                            logstatement += "Put " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            data.Add(userstring, locationstring);
-                            sw.WriteLine("HTTP/0.9 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
-                            logstatement += "Put " + datastring + " - OK";
-                        }
-                    }
-                } //-h9
-                else if (sections.Contains("HTTP/1.0")) //-h0
-                {
-                    if (sections[0] == ("GET"))
-                    {
-                        sections.RemoveAt(0);
-                        userstring = sections[0];
-                        userstring = userstring.Remove(0, 2);
-
-                        if (data.ContainsKey(userstring))
-                        {
-                            sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n");
-                            logstatement += "GET " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            sw.WriteLine("HTTP/1.0 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
-                            logstatement += "GET " + datastring + " ERROR: no entries found";
-                        }
-                    }
-                    if (sections.Contains("POST"))
-                    {
-                        sections.RemoveAt(0);
-                        userstring = sections[0];
-                        userstring = userstring.Remove(0, 2);
-
-                        if (data.ContainsKey(userstring))
-                        {
-                            data[userstring] = locationstring;
-                            sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + "\r\n"); ///location added (put) responce 5
-                            logstatement += "Put " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            data.Add(userstring, locationstring);
-                            sw.WriteLine("HTTP/1.0 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + "\r\n"); ///location added (put) responce 5
-                            logstatement += "Put " + datastring + " - OK";
-                        }
-                    }
-                } // -h0
-                else if (sections.Contains("HTTP/1.1"))
-                {
-                    if (sections[0] == ("GET"))
-                    {
-                        sections.RemoveAt(0);
-                        userstring = sections[0];
-                        userstring = userstring.Remove(0, 7);
-
-                        if (data.ContainsKey(userstring))
-                        {
-                            sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n" + data[userstring] + "\r\n"); //location ok responce 3
-                            logstatement += "GET " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            sw.WriteLine("HTTP/1.1 404 Not Found" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); /// location 404 responce 4
-                            logstatement += "GET " + datastring + " ERROR: no entries found";
-                        }
-                    }
-                    if (sections.Contains("POST"))
-                    {
-                        userstring = locationstring.Remove(0, 5);
-                        userstring.Replace("&location=", " ");
-                        string[] tmp = userstring.Split(' ');
-                        userstring = tmp[0];
-                        locationstring = tmp[1];
-
-                        if (data.ContainsKey(userstring))
-                        {
-                            data[userstring] = locationstring;
-                            sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
-                            logstatement += "Put " + datastring + " - OK";
-                        }
-                        else
-                        {
-                            data.Add(userstring, locationstring);
-                            sw.WriteLine("HTTP/1.1 200 OK" + "\r\n" + "Content-Type: text/plain" + "\r\n" + "\r\n"); ///location added (put) responce 5
-                            logstatement += "Put " + datastring + " - OK";
-                        }
-                    }
-
-                } //-h1
-                else if (Whois.Length == 2)
-                {
-                    if (data.ContainsKey(Whois[0]))
-                    {
-                        data[Whois[0]] = Whois[1];
-                        sw.WriteLine("OK");
-                        logstatement += "Put " + datastring + " - OK";
+                        Console.WriteLine(x.ToString());
+                        input = "Something went wrong";
                     }
                     else
                     {
-                        data.Add(Whois[0], Whois[1]);
-                        sw.WriteLine("OK");
-                        logstatement += "Put " + datastring + " - OK";
+                        input = "Something went wrong";
                     }
+                    State = "EXCEPTION";
                 }
-                else if (Whois.Length == 1)
+                finally
                 {
+                    socketStream.Close();
+                    connection.Close();
 
-                    if (data.ContainsKey(Whois[0]))
-                    {
-                        sw.WriteLine(data[Whois[0]]);
-                        logstatement += "GET " + datastring + " - OK";
-                    }
-                    else
-                    {
-                        sw.WriteLine("ERROR: no entries found");
-                        logstatement += "GET " + datastring + " ERROR: no entries found";
-                    }
+                    Log.WriteToLog(Host, input, State, debug);
                 }
-                else { }
-                log.Add(localDate, logstatement);
-                Console.WriteLine(log.Keys.Last() + " " + log.Values.Last());
-                logstatement = "";
             }
-            catch (Exception x)
+        }
+
+
+        public class Logging
+        {
+            public static string LogFile = null;
+            public static string savefile = null;
+            public Logging(string Logpath, string savepath)
             {
-                Console.WriteLine(x.ToString());
+                LogFile = Logpath;
+                savefile = savepath;
+            }
+
+            private static readonly object locker = new object();
+
+
+            public void WriteToLog(string Host, string input, string State, bool debug)
+            {
+                string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
+                lock (locker)
+                {
+                    Console.WriteLine(line);
+                    if (savefile == "")
+                    {
+                    }
+                    else
+                    {
+                        try
+                        {
+                            StreamWriter SW;
+                            SW=new StreamWriter (savefile, false);
+                            foreach (var entry in data)
+                                {
+                                    SW.WriteLine(entry.Key + " "+ entry.Value);
+                                }
+                            SW.Close();
+                        }
+                        catch (Exception s)
+                        {
+                            if (debug == true)
+                            {
+                                Console.WriteLine(s.ToString());
+                            }
+                            else
+                            {
+                                Console.WriteLine("Unable to Write Save File");
+                            }
+                        }
+                    }
+                    if (LogFile == "")
+                    {
+                        return;
+                    }
+                    try
+                    {
+                        StreamWriter SW;
+                        SW = File.AppendText(LogFile);
+                        SW.WriteLine(line);
+                        SW.Close();
+                    }
+                    catch (Exception l)
+                    {
+                        if (debug == true)
+                        {
+                            Console.WriteLine(l.ToString());
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unable to Write Log File");
+                        }
+                    }
+                }
             }
         }
     }
