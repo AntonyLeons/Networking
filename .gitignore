@@ -15,3 +15,5 @@ locationserver/locationserver/obj/Debug/locationserver.csprojAssemblyReference.c
 *.cache
 *.cache
 *.ide-wal
+locationserver/.vs/locationserver/v15/.suo
+location/.vs/location/v15/.suo
