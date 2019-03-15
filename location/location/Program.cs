@@ -64,12 +64,7 @@ namespace location
                     
                     StreamWriter sw = new StreamWriter(client.GetStream());
                     StreamReader sr = new StreamReader(client.GetStream());
-                    StringBuilder appendLine = new StringBuilder();
-                    StringBuilder appendData = new StringBuilder();
-                    string datastring;
                     string response = "";
-                    int c= 0;
-                    bool html=false;
                     sw.AutoFlush = true;
                     switch (protocol)
                     {
@@ -77,11 +72,7 @@ namespace location
                             if (location == null)
                             {
                                 sw.WriteLine(username);
-                                while (sr.Peek() >= 0)
-                                {
-                                    appendLine.Append(sr.ReadLine());
-                                }
-                                response = appendLine.ToString();
+                                response = sr.ReadLine();
                                 if (response.Contains("ERROR: no entries found"))
                                 {
                                     Console.WriteLine(response);
@@ -94,11 +85,7 @@ namespace location
                             else
                             {
                                 sw.WriteLine(username + " " + location);
-                                while (sr.Peek() >= 0)
-                                {
-                                    appendLine.Append(sr.ReadLine());
-                                }
-                                response = appendLine.ToString();
+                                response = sr.ReadLine();
                                 if (response.Contains("OK"))
                                 {
                                     Console.WriteLine(username + " location changed to be " + location);
@@ -109,14 +96,11 @@ namespace location
                             if (location == null)
                             {
                                 sw.Write("GET /" + username + "\r\n");
-                                while (!sr.EndOfStream)
-                                {
-                                    response += (char)sr.Read();
-                                }
-                                datastring = response.Replace("\r\n", "ÿ");
-                                List<string> lines = new List<string>(datastring.Split('ÿ').ToList());
-                                location = lines[3];
-                                if (lines[0].Contains("404 Not Found"))
+                                response = sr.ReadLine();
+                                sr.ReadLine();
+                                string OH = sr.ReadLine();
+                                location = sr.ReadLine();
+                                if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
                                 }
@@ -128,11 +112,7 @@ namespace location
                             else 
                             {
                                 sw.Write("PUT /" + username + "\r\n" + "\r\n" + location + "\r\n");
-                                while (sr.Peek() >= 0)
-                                {
-                                    appendLine.Append(sr.ReadLine());
-                                }
-                                response = appendLine.ToString();
+                                response = sr.ReadLine();
                                 if (response.Contains("OK"))
                                 {
                                     Console.WriteLine(username + " location changed to be " + location);
@@ -143,37 +123,27 @@ namespace location
                             if (location==null)
                             {
                                 sw.Write("GET /?" + username + " HTTP/1.0" + "\r\n" + "\r\n");
-                                while (!sr.EndOfStream)
-                                {
-                                    response += (char)sr.Read();
-                                }
-                                datastring = response.Replace("\r\n", "ÿ");
-                                List<string> lines = new List<string>(datastring.Split('ÿ').ToList());
-                                location = lines[3];
+                                response = sr.ReadLine();
+                                sr.ReadLine();
+                                string OH = sr.ReadLine();
+                                location = sr.ReadLine();
 
-                                if (lines[0].Contains("404 Not Found"))
+                                if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
-                                    break;
                                 }
                                 else
                                 {
                                     Console.WriteLine(username + " is " + location);
-                                    break;
                                 }
                             }
                             else
                             {
                                 sw.Write("POST /" + username + " HTTP/1.0" + "\r\n" + "Content-Length: " + location.Length + "\r\n" + "\r\n" + location);
-                                while (sr.Peek() >= 0)
-                                {
-                                    appendLine.Append(sr.ReadLine());
-                                }
-                                response = appendLine.ToString();
+                                response = sr.ReadLine();
                                 if (response.Contains("OK"))
                                 {
                                     Console.WriteLine(username + " location changed to be " + location);
-                                    break;
                                 }
                             }
                             break;
@@ -181,52 +151,36 @@ namespace location
                             if (location==null)
                             {
                                 sw.Write("GET /?name=" + username + " HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "\r\n");
-                                System.Threading.Thread.Sleep(100);
-                                while (sr.Peek() >= 0)
+                                response =sr.ReadLine();
+                                sr.ReadLine();
+                                string OH = sr.ReadLine();
+                                while(OH!="")
                                 {
-                                    response += (char)sr.Read();
+                                    OH = sr.ReadLine();
                                 }
-                                datastring = response.Replace("\r\n", "ÿ");
-                                List<string> lines = new List<string>(datastring.Split('ÿ').ToList());
-                                for (int i = 3; i < lines.Count; i++)
+                                location = sr.ReadLine() + "\r\n";
+                              while  (sr.Peek() >= 0)
                                 {
-                                    if(lines[i].StartsWith("<html>"))
-                                    {
-                                        html = true;
-                                        location = "";
-                                    }
-                                    if (html == true)
-                                    {
-                                        location += lines[i] + "\r\n";
-                                    }else
-                                    {
-                                        location = lines[3];
-                                    }
+                                    location += sr.ReadLine()+"\r\n";
                                 }
-                                if (lines[0].Contains("404 Not Found"))
+
+                                if (response.Contains("404 Not Found"))
                                 {
                                     Console.WriteLine(response);
-                                    break;
                                 }
                                 else
                                 {
                                     Console.WriteLine(username + " is " + location);
-                                    break;
                                 }
                             }
                             else
                             {
                                 int length = username.Length + location.Length + 15;
                                 sw.Write("POST / " + "HTTP/1.1" + "\r\n" + "Host: " + host + "\r\n" + "Content-Length: " + length + "\r\n" + "\r\n" + "name=" + username + "&location=" + location);
-                                while (sr.Peek() >= 0)
-                                {
-                                    appendLine.Append(sr.ReadLine());
-                                }
-                                response = appendLine.ToString();
+                                response = sr.ReadLine();
                                 if (response.Contains("OK"))
                                 {
                                     Console.WriteLine(username + " location changed to be " + location);
-                                    break;
                                 }
                             }
                             break;
