@@ -24,12 +24,13 @@ namespace locationserver
                 string savepath = "";
                 string logpath = "";
                 short timeout = 1000;
+                bool debug = false;
                 for (int i = 0; i < args.Length; i++)
                 {
                     switch (args[i])
                     {
                         case "-l": logpath = args[++i]; break;
-                        case "-d": break;
+                        case "-d": debug = true;  break;
                         case "-f": savepath = args[++i]; break;
                         case "-t": timeout = short.Parse(args[++i]); break;
                         default:
@@ -340,7 +341,10 @@ namespace locationserver
                 }
                 catch (Exception x)
                 {
-                    Console.WriteLine(x.ToString());
+                    if (debug == true)
+                    {
+                        Console.WriteLine(x.ToString());
+                    }
                     State = "EXCEPTION";
                 }
                 finally
