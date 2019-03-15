@@ -25,6 +25,7 @@ namespace locationserver
                 string logpath = "";
                 short timeout = 1000;
                 bool debug = false;
+
                 for (int i = 0; i < args.Length; i++)
                 {
                     switch (args[i])
@@ -56,7 +57,7 @@ namespace locationserver
                 }
                 Log = new Logging(logpath,savepath);
                 {
-                    RunServer(timeout);
+                    RunServer(timeout,debug);
                 }
 
                 return 0;
@@ -68,7 +69,7 @@ namespace locationserver
                 return app.Run();
             }
         }
-        static void RunServer(short timeout)
+        static void RunServer(short timeout,bool debug)
         {
             TcpListener listener;
             Socket connection;
@@ -84,19 +85,28 @@ namespace locationserver
                     connection = listener.AcceptSocket();
                     RequestHandler = new Handler();
 
-                    Thread t = new Thread(() => RequestHandler.doRequest(connection, Log, timeout));
+                    Thread t = new Thread(() => RequestHandler.doRequest(connection, Log, timeout, debug));
                     t.Start();
                     //Console.WriteLine("Connection Recieved");
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception:" + e.ToString());
+                if (debug == true)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+                else
+                {
+                    Console.WriteLine("Server failed");
+                }
             }
         }
         class Handler
         {
-            public void doRequest(Socket connection, Logging Log, short timeout)
+
+
+            public void doRequest(Socket connection, Logging Log, short timeout,bool debug)
             {
                 String Host = ((IPEndPoint)connection.RemoteEndPoint).Address.ToString();
                 NetworkStream socketStream;
@@ -184,6 +194,7 @@ namespace locationserver
                                 {
                                     locationstring += (char)sr.Read();
                                 }
+                                locationstring = locationstring.Replace("\r\n", "");
                                 userstring = sections[1];
                                 userstring = userstring.Remove(0, 1);
 
@@ -236,6 +247,7 @@ namespace locationserver
                                 string[] tmp = userstring.Split('ÿ');
                                 userstring = tmp[0];
                                 locationstring = tmp[1];
+                                locationstring = locationstring.Replace("\r\n", "");
 
                                 if (data.ContainsKey(userstring))
                                 {
@@ -344,6 +356,11 @@ namespace locationserver
                     if (debug == true)
                     {
                         Console.WriteLine(x.ToString());
+                        input = "Something went wrong";
+                    }
+                    else
+                    {
+                        input = "Something went wrong";
                     }
                     State = "EXCEPTION";
                 }
@@ -352,7 +369,7 @@ namespace locationserver
                     socketStream.Close();
                     connection.Close();
 
-                    Log.WriteToLog(Host, input, State);
+                    Log.WriteToLog(Host, input, State, debug);
                 }
             }
         }
@@ -371,7 +388,7 @@ namespace locationserver
             private static readonly object locker = new object();
 
 
-            public void WriteToLog(string Host, string input, string State)
+            public void WriteToLog(string Host, string input, string State, bool debug)
             {
                 string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
                 lock (locker)
@@ -392,9 +409,16 @@ namespace locationserver
                                 }
                             SW.Close();
                         }
-                        catch
+                        catch (Exception s)
                         {
-                            Console.WriteLine("Unable to Write Save File");
+                            if (debug == true)
+                            {
+                                Console.WriteLine(s.ToString());
+                            }
+                            else
+                            {
+                                Console.WriteLine("Unable to Write Save File");
+                            }
                         }
                     }
                     if (LogFile == "")
@@ -408,9 +432,16 @@ namespace locationserver
                         SW.WriteLine(line);
                         SW.Close();
                     }
-                    catch
+                    catch (Exception l)
                     {
-                        Console.WriteLine("Unable to Write Log File");
+                        if (debug == true)
+                        {
+                            Console.WriteLine(l.ToString());
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unable to Write Log File");
+                        }
                     }
                 }
             }
