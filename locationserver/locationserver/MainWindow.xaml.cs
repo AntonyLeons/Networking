@@ -22,23 +22,34 @@ namespace locationserver
         public MainWindow()
         {
             InitializeComponent();
-            // string line = "Logging started";
-           //  Thread thread = new Thread(new ThreadStart(UpdateTextBoxThread(line)));
-           //  thread.Start();
         }
          public string line;
-        public void UpdateTextBoxThread(string line)
-        {
-            Status.Text += line;
-        }
 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
             Start.IsEnabled = false;
             Stop.IsEnabled = true;
             string logpath = "";
+            string savepath = Path.Text;
+            if (savepath != null)
+            {
+                try
+                {
+                    string[] lines = File.ReadAllLines(savepath);
+                    foreach (string entry in lines)
+                    {
+                        string[] entrysplit = entry.Split();
+                        data.Add(entrysplit[0], entrysplit[1]);
+                    }
+                    Status.AppendText("file found and data loaded\n");
+                }
+                catch
+                {
+                    Status.AppendText("No file found, creating new file\n");
+                }
+            }
             timeout = short.Parse(Timebox.Text);
-            Log = new Logging(logpath);
+            Log = new Logging(logpath,savepath);
             Task taskA = Task.Run(() => RunServer(timeout,Log));
             Status.AppendText("Server Started... \n");
         }
@@ -50,7 +61,6 @@ namespace locationserver
             Handler RequestHandler;
             try
             {
-                string Logpath="";
                 listener = new TcpListener(IPAddress.Any, 43);
                 listener.Start();
                 while (true)
@@ -72,7 +82,6 @@ namespace locationserver
         {
             Start.IsEnabled = true;
             Stop.IsEnabled = false;
-            //ct.Cancel();
             Status.AppendText("Server stopped \n");
 
         }
@@ -345,9 +354,12 @@ namespace locationserver
         public class Logging
         {
             public static string LogFile = null;
-            public Logging(string Logpath)
+            public static string SaveFile = null;
+
+            public Logging(string Logpath, string savepath)
             {
                 LogFile = Logpath;
+                SaveFile = savepath;
             }
 
             private static readonly object locker = new object();
@@ -360,7 +372,28 @@ namespace locationserver
                 lock (locker)
                 {
                    Status+=(line + "\n");
-
+                    if (SaveFile == "")
+                    {
+                    }
+                    else
+                    {
+                        try
+                        {
+                            StreamWriter SW;
+                            SW = new StreamWriter(SaveFile, false);
+                            foreach (var entry in data)
+                            {
+                                SW.WriteLine(entry.Key + " " + entry.Value);
+                            }
+                            SW.Close();
+                        }
+                        catch (Exception s)
+                        {
+                            {
+                                Console.WriteLine("Unable to Write Save File");
+                            }
+                        }
+                    }
                     if (LogFile == "")
                     {
                         return;
@@ -378,6 +411,11 @@ namespace locationserver
                     }
                 }
             }
+        }
+
+        private void SaveLog_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

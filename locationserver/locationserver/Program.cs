@@ -49,6 +49,7 @@ namespace locationserver
                             string[] entrysplit = entry.Split();
                             data.Add(entrysplit[0], entrysplit[1]);
                         }
+                        Console.WriteLine("file found and data loaded");
                     }
                     catch
                     {
