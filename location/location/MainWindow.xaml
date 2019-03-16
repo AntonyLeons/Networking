@@ -21,6 +21,9 @@
         <RadioButton x:Name="Http0_9" Content="Http 0.9" HorizontalAlignment="Left" Margin="280,158,0,0" VerticalAlignment="Top"/>
         <RadioButton x:Name="Http1_0" Content="Http 1.0" HorizontalAlignment="Left" Margin="380,158,0,0" VerticalAlignment="Top"/>
         <RadioButton x:Name="Http1_1" Content="Http 1.1" HorizontalAlignment="Left" Margin="480,158,0,0" VerticalAlignment="Top"/>
+        <Label Content="Timeout" HorizontalAlignment="Left" Margin="669,191,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TimeBox" HorizontalAlignment="Left" Height="23" Margin="666,222,0,0" TextWrapping="Wrap" Text="1000" VerticalAlignment="Top" Width="62" TextAlignment="Center"/>
+        <CheckBox x:Name="Debug" Content="Debug" HorizontalAlignment="Left" Margin="671,311,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

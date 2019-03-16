@@ -31,13 +31,14 @@ namespace location
         {
             try
             {
+
                 TcpClient client = new TcpClient();
                 string username = null;
                 string location = null;
 
                 client.Connect(Address.Text, short.Parse(Port.Text));
-                client.ReceiveTimeout = 1000;
-                client.SendTimeout = 1000;
+                client.ReceiveTimeout = short.Parse(TimeBox.Text);
+                client.SendTimeout = short.Parse(TimeBox.Text);
 
                 StreamWriter sw = new StreamWriter(client.GetStream());
                 StreamReader sr = new StreamReader(client.GetStream());
@@ -186,7 +187,15 @@ namespace location
 
             catch (Exception x)
             {
-                Status.AppendText("Something went wrong + \n");
+
+                if (Debug.IsChecked == true)
+                {
+                    Status.AppendText(x.ToString());
+                }
+                else
+                {
+                    Status.AppendText("Something went wrong + \n");
+                }
             }
         }
 

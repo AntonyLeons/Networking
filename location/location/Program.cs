@@ -11,6 +11,8 @@ namespace location
 {
     class Program
     {
+        private static bool debug;
+
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         static extern bool FreeConsole();
 
@@ -193,8 +195,15 @@ namespace location
 
                 catch (Exception e)
                 {
-                    Console.WriteLine("Something went wrong");
-                    Console.WriteLine(e);
+                    if(debug==true)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Something went wrong");
+                    }
+                   
                 }
                
                 return 0;
