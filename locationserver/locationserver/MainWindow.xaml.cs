@@ -26,11 +26,20 @@ namespace locationserver
             InitializeComponent();
         }
         public string line;
-
+          void AppendMyText(string text)
+        {
+            Status.AppendText(line);
+        }
         private void Start_Click(object sender, RoutedEventArgs e)
         {
             Start.IsEnabled = false;
             Stop.IsEnabled = true;
+            SaveLog.IsEnabled = true;
+            Timebox.IsEnabled = false;
+            Path.IsEnabled = false;
+
+               // Status.SetBinding(line)
+            
             string logpath = "";
             string savepath = Path.Text;
             if (savepath != "")
@@ -84,6 +93,9 @@ namespace locationserver
         {
             Start.IsEnabled = true;
             Stop.IsEnabled = false;
+            SaveLog.IsEnabled = false;
+            Timebox.IsEnabled = true;
+            Path.IsEnabled = true;
             Status.AppendText("Server stopped \n");
 
         }
@@ -94,8 +106,7 @@ namespace locationserver
 
         class Handler
         {
-            public short timeout { get; private set; }
-            public string Logging { get; private set; }
+
             public void doRequest(Socket connection, Logging Log, short timeout)
             {
                 String Host = ((IPEndPoint)connection.RemoteEndPoint).Address.ToString();
@@ -366,16 +377,14 @@ namespace locationserver
 
             private static readonly object locker = new object();
 
-            public string Status { get; private set; }
+
 
             public void WriteToLog(string Host, string input, string State)
             {
-                string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
-                S
+                string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; 
                 log.Add(line);
                 lock (locker)
                 {
-                    Status += (line + "\n");
                     if (SaveFile == "")
                     {
                     }
