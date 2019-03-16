@@ -37,8 +37,11 @@ namespace location
                 string location = null;
 
                 client.Connect(Address.Text, short.Parse(Port.Text));
-                client.ReceiveTimeout = short.Parse(TimeBox.Text);
-                client.SendTimeout = short.Parse(TimeBox.Text);
+                if (short.Parse(TimeBox.Text) > 0)
+                {
+                    client.ReceiveTimeout = short.Parse(TimeBox.Text);
+                    client.SendTimeout = short.Parse(TimeBox.Text);
+                }
 
                 StreamWriter sw = new StreamWriter(client.GetStream());
                 StreamReader sr = new StreamReader(client.GetStream());

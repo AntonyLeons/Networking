@@ -37,9 +37,6 @@ namespace locationserver
             SaveLog.IsEnabled = true;
             Timebox.IsEnabled = false;
             Path.IsEnabled = false;
-
-               // Status.SetBinding(line)
-            
             string logpath = "";
             string savepath = Path.Text;
             if (savepath != "")
@@ -116,9 +113,11 @@ namespace locationserver
                 string State = "";
                 try
                 {
-
-                    socketStream.ReadTimeout = timeout;
-                    socketStream.WriteTimeout = timeout;
+                    if (timeout > 0)
+                    {
+                        socketStream.ReadTimeout = timeout;
+                        socketStream.WriteTimeout = timeout;
+                    }
                     StreamWriter sw = new StreamWriter(socketStream);
                     StreamReader sr = new StreamReader(socketStream);
                     sw.AutoFlush = true;

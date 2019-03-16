@@ -63,10 +63,12 @@ namespace location
                         {
                             Console.WriteLine("Too few arguments");
                         }
-                    
                     client.Connect(host, port);
-                    client.ReceiveTimeout = timeout;
-                    client.SendTimeout = timeout;
+                    if (timeout > 0)
+                    {
+                        client.ReceiveTimeout = timeout;
+                        client.SendTimeout = timeout;
+                    }
                     
                     StreamWriter sw = new StreamWriter(client.GetStream());
                     StreamReader sr = new StreamReader(client.GetStream());
