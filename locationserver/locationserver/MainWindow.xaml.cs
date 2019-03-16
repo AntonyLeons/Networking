@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -17,13 +18,14 @@ namespace locationserver
     public partial class MainWindow : Window
     {
         static Dictionary<string, string> data = new Dictionary<string, string>();
+        static List<string> log = new List<string>();
         public static Logging Log;
         public short timeout { get; private set; }
         public MainWindow()
         {
             InitializeComponent();
         }
-         public string line;
+        public string line;
 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
@@ -31,7 +33,7 @@ namespace locationserver
             Stop.IsEnabled = true;
             string logpath = "";
             string savepath = Path.Text;
-            if (savepath != null)
+            if (savepath != "")
             {
                 try
                 {
@@ -49,8 +51,8 @@ namespace locationserver
                 }
             }
             timeout = short.Parse(Timebox.Text);
-            Log = new Logging(logpath,savepath);
-            Task taskA = Task.Run(() => RunServer(timeout,Log));
+            Log = new Logging(logpath, savepath);
+            Task taskA = Task.Run(() => RunServer(timeout, Log));
             Status.AppendText("Server Started... \n");
         }
         static void RunServer(short timeout, Logging Log)
@@ -90,10 +92,10 @@ namespace locationserver
             Status.ScrollToEnd();
         }
 
- class Handler
+        class Handler
         {
             public short timeout { get; private set; }
-            public string Logging{get; private set; }
+            public string Logging { get; private set; }
             public void doRequest(Socket connection, Logging Log, short timeout)
             {
                 String Host = ((IPEndPoint)connection.RemoteEndPoint).Address.ToString();
@@ -190,7 +192,7 @@ namespace locationserver
                                 {
                                     data[userstring] = locationstring;
                                     sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
-                                    input = "POST " + userstring + " " +locationstring;
+                                    input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
                                 }
@@ -305,7 +307,7 @@ namespace locationserver
                             {
                                 data[Whois[0]] = Whois[1];
                                 sw.WriteLine("OK");
-                                input = "POST " + Whois[0]+ " "+Whois[1];
+                                input = "POST " + Whois[0] + " " + Whois[1];
                                 State = "OK";
                                 break;
                             }
@@ -369,9 +371,10 @@ namespace locationserver
             public void WriteToLog(string Host, string input, string State)
             {
                 string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
+                log.Add(line);
                 lock (locker)
                 {
-                   Status+=(line + "\n");
+                    Status += (line + "\n");
                     if (SaveFile == "")
                     {
                     }
@@ -394,28 +397,29 @@ namespace locationserver
                             }
                         }
                     }
-                    if (LogFile == "")
-                    {
-                        return;
-                    }
-                    try
-                    {
-                        StreamWriter SW;
-                        SW = File.AppendText(LogFile);
-                        SW.WriteLine(input);
-                        SW.Close();
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Unable to Write Log File");
-                    }
                 }
             }
         }
-
-        private void SaveLog_Click(object sender, RoutedEventArgs e)
+        private void SaveLog_Click_1(object sender, RoutedEventArgs e)
         {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "Log"; // Default file name
+            dlg.DefaultExt = ".txt"; // Default file extension
+            dlg.Title = "Save Log";
+            dlg.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
 
+            // Show save file dialog box
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Process save file dialog box results
+            if (result == true)
+            {
+                // Save document
+                string filename = dlg.FileName;
+                using (StreamWriter file = new StreamWriter(filename))
+                    foreach (var entry in log)
+                        file.WriteLine(entry);
+            }
         }
     }
 }
