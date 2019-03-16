@@ -12,3 +12,4 @@ G:\GitHub\Networking\location\location\obj\Release\location.csproj.GenerateResou
 G:\GitHub\Networking\location\location\obj\Release\location.csproj.CoreCompileInputs.cache
 G:\GitHub\Networking\location\location\obj\Release\location.exe
 G:\GitHub\Networking\location\location\obj\Release\location.pdb
+G:\GitHub\Networking\location\location\obj\Release\location.csprojAssemblyReference.cache

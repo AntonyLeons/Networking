@@ -371,6 +371,7 @@ namespace locationserver
             public void WriteToLog(string Host, string input, string State)
             {
                 string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
+                S
                 log.Add(line);
                 lock (locker)
                 {
