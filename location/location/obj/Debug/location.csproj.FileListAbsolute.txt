@@ -31,7 +31,6 @@ C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Debug\location.
 G:\GitHub\Networking\location\location\bin\Debug\location.exe.config
 G:\GitHub\Networking\location\location\bin\Debug\location.exe
 G:\GitHub\Networking\location\location\bin\Debug\location.pdb
-G:\GitHub\Networking\location\location\obj\Debug\location.csprojAssemblyReference.cache
 G:\GitHub\Networking\location\location\obj\Debug\MainWindow.g.cs
 G:\GitHub\Networking\location\location\obj\Debug\App.g.cs
 G:\GitHub\Networking\location\location\obj\Debug\location_MarkupCompile.cache
