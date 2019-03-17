@@ -57,4 +57,3 @@ G:\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.cspr
 G:\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.csproj.CoreCompileInputs.cache
 G:\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.exe
 G:\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.pdb
-G:\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.csprojAssemblyReference.cache

@@ -42,3 +42,4 @@ G:\GitHub\Networking\location\location\obj\Debug\location.csproj.GenerateResourc
 G:\GitHub\Networking\location\location\obj\Debug\location.csproj.CoreCompileInputs.cache
 G:\GitHub\Networking\location\location\obj\Debug\location.exe
 G:\GitHub\Networking\location\location\obj\Debug\location.pdb
+G:\GitHub\Networking\location\location\obj\Debug\location.csprojAssemblyReference.cache

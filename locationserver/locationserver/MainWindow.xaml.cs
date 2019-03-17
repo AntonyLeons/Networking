@@ -27,10 +27,6 @@ namespace locationserver
             InitializeComponent();
         }
         public string line;
-          void AppendMyText(string text)
-        {
-            Status.AppendText(line);
-        }
         private void Start_Click(object sender, RoutedEventArgs e)
         {
             Start.IsEnabled = false;
@@ -45,7 +41,7 @@ namespace locationserver
             {
                 try
                 {
-                    string[] lines = File.ReadAllLines(savepath);
+                    string[] lines = File.ReadAllLines(savepath); ///read save file and import to dictionary
                     foreach (string entry in lines)
                     {
                         string[] entrysplit = entry.Split();
@@ -61,11 +57,10 @@ namespace locationserver
             timeout = short.Parse(Timebox.Text);
             r = new Thread(() => RunServer(timeout, Log));
             Log = new Logging(logpath, savepath);
-            // Task taskA = Task.Run(() => RunServer(timeout, Log));
-                r.Start();
+            r.Start();
             Status.AppendText("Server Started... \n");
         }
-        static void RunServer(short timeout, Logging Log)
+        static void RunServer(short timeout, Logging Log) /// From Brians Youtube
         {
             TcpListener listener;
             Socket connection;
@@ -98,13 +93,13 @@ namespace locationserver
             Timebox.IsEnabled = true;
             Path.IsEnabled = true;
             DebugBox.IsEnabled = true;
-           r.Abort();
+            r.Abort();
             Status.AppendText("Server Stopped \n");
 
         }
         public void Status_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Status.ScrollToEnd();
+            Status.ScrollToEnd(); ///auto scroll
         }
 
         class Handler
@@ -119,7 +114,7 @@ namespace locationserver
                 string State = "";
                 try
                 {
-                    if (timeout > 0)
+                    if (timeout > 0) ///timeout
                     {
                         socketStream.ReadTimeout = timeout;
                         socketStream.WriteTimeout = timeout;
@@ -139,7 +134,7 @@ namespace locationserver
 
                     string[] Whois = input.Split(new char[] { ' ' }, 2);
                     input = input.Trim();
-                    while (sr.Peek() >= 0)
+                    while (sr.Peek() >= 0) /// Check lines exist and count them
                     {
                         sr.ReadLine();
                         lines++;
@@ -160,7 +155,7 @@ namespace locationserver
                     {
                         post = true;
                     }
-                    if (sections.Count >= 2) //check
+                    if (sections.Count >= 2) //check if more than 2 arguments
                     {
                         if (sections[1].StartsWith("/"))
                         {
@@ -182,7 +177,7 @@ namespace locationserver
 
                                 if (data.TryGetValue(userstring, out locationstring))
                                 {
-                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n");
+                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); ///location added (GET) responce 3
                                     input = "GET " + userstring;
                                     State = "OK";
                                     break;
@@ -207,7 +202,7 @@ namespace locationserver
                                 if (data.ContainsKey(userstring))
                                 {
                                     data[userstring] = locationstring;
-                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
+                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (POST) responce 5
                                     input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
@@ -215,7 +210,7 @@ namespace locationserver
                                 else
                                 {
                                     data.Add(userstring, locationstring);
-                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (put) responce 5
+                                    sw.WriteLine("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\n\r\n"); ///location added (POST) responce 5
                                     input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
@@ -228,7 +223,7 @@ namespace locationserver
 
                                 if (data.TryGetValue(userstring, out locationstring))
                                 {
-                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); //location ok responce 3
+                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); ///location OK responce 3
                                     input = "GET " + userstring;
                                     State = "OK";
                                     break;
@@ -257,7 +252,7 @@ namespace locationserver
                                 if (data.ContainsKey(userstring))
                                 {
                                     data[userstring] = locationstring;
-                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (POST) responce 5
                                     input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
@@ -265,7 +260,7 @@ namespace locationserver
                                 else
                                 {
                                     data.Add(userstring, locationstring);
-                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    sw.WriteLine("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (POST) responce 5
                                     input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
@@ -281,7 +276,7 @@ namespace locationserver
 
                                 if (data.TryGetValue(userstring, out locationstring))
                                 {
-                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); ///location OK 3
+                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n" + locationstring + "\r\n"); ///location OK responce 3
                                     input = "GET " + userstring;
                                     State = "OK";
                                     break;
@@ -302,7 +297,7 @@ namespace locationserver
                                 if (data.ContainsKey(userstring))
                                 {
                                     data[userstring] = locationstring;
-                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (POST) responce 5
                                     input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
@@ -310,14 +305,14 @@ namespace locationserver
                                 else
                                 {
                                     data.Add(userstring, locationstring);
-                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (put) responce 5
+                                    sw.WriteLine("HTTP/0.9 200 OK\r\nContent-Type: text/plain\r\n\r\n"); ///location added (POST) responce 5
                                     input = "POST " + userstring + " " + locationstring;
                                     State = "OK";
                                     break;
                                 }
                             }
                         }
-                        if (Whois.Length == 2)
+                        if (Whois.Length == 2) //whois protocol
                         {
                             if (data.ContainsKey(Whois[0]))
                             {
@@ -369,7 +364,7 @@ namespace locationserver
                 }
             }
         }
-        public class Logging
+        public class Logging /// based on example from https://stackoverflow.com/questions/2954900/simple-multithread-safe-log-class
         {
             public static string LogFile = null;
             public static string SaveFile = null;
@@ -386,7 +381,7 @@ namespace locationserver
 
             public void WriteToLog(string Host, string input, string State)
             {
-                string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; 
+                string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State;
                 log.Add(line);
                 lock (locker)
                 {
@@ -417,7 +412,7 @@ namespace locationserver
         }
         private void SaveLog_Click_1(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog dlg = new SaveFileDialog
+            SaveFileDialog dlg = new SaveFileDialog ///based on code from documentation https://docs.microsoft.com/en-us/dotnet/api/microsoft.win32.savefiledialog?view=netframework-4.7.2
             {
                 FileName = "Log", // Default file name
                 DefaultExt = ".txt", // Default file extension

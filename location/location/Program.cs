@@ -13,7 +13,7 @@ namespace location
     {
         private static bool debug;
 
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)] /// hybrid application from https://stackoverflow.com/questions/5339193/wpf-console-hybrid-application
         static extern bool FreeConsole();
 
         [STAThread]
@@ -23,13 +23,12 @@ namespace location
             {
                 try
                 {
-                    TcpClient client = new TcpClient();
+                    TcpClient client = new TcpClient();  //from Brians panopto
                     string host = "whois.net.dcs.hull.ac.uk";
                     int port = 43;
                     string protocol = "whois";
                     string username = null;
                     string location = null;
-                    bool debug = false;
                     short timeout = 1000;
                     for (int i = 0; i < args.Length; i++)
                     {
@@ -41,7 +40,7 @@ namespace location
                             case "-h0":
                             case "-h1": protocol = args[i]; break;
                             case "-d": debug = true; break;
-                            case "-t": timeout = short.Parse(args[++i]); break;
+                            case "-t": timeout = short.Parse(args[++i]); break; /// detect arguments
 
                             default:
                                 if (username == null)
@@ -64,7 +63,7 @@ namespace location
                             Console.WriteLine("Too few arguments");
                         }
                     client.Connect(host, port);
-                    if (timeout > 0)
+                    if (timeout > 0) /// timeout
                     {
                         client.ReceiveTimeout = timeout;
                         client.SendTimeout = timeout;
@@ -197,7 +196,7 @@ namespace location
 
                 catch (Exception e)
                 {
-                    if(debug==true)
+                    if(debug==true) //debug
                     {
                         Console.WriteLine(e);
                     }
@@ -212,7 +211,7 @@ namespace location
             }
             else
             {
-                FreeConsole();
+                FreeConsole(); /// open ui
                 var app = new App();
                 return app.Run();
             }

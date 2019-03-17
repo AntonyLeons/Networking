@@ -33,7 +33,6 @@ namespace location
             {
 
                 TcpClient client = new TcpClient();
-                string username = null;
                 string location = null;
 
                 client.Connect(Address.Text, short.Parse(Port.Text));
@@ -127,7 +126,7 @@ namespace location
                         {
                             OH = sr.ReadLine();
                         }
-                        location = sr.ReadLine();
+                        location = sr.ReadLine() + "\n";
                         while (sr.Peek() >= 0)
                         {
                             location += sr.ReadLine() + "\n";
@@ -204,7 +203,7 @@ namespace location
 
         private void Status_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Status.ScrollToEnd();
+            Status.ScrollToEnd(); ///autoscroll
         }
     }
 }
