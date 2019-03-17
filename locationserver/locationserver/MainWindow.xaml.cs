@@ -20,6 +20,7 @@ namespace locationserver
         static Dictionary<string, string> data = new Dictionary<string, string>();
         static List<string> log = new List<string>();
         public static Logging Log;
+        public static Thread r;
         public short timeout { get; private set; }
         public MainWindow()
         {
@@ -37,6 +38,7 @@ namespace locationserver
             SaveLog.IsEnabled = true;
             Timebox.IsEnabled = false;
             Path.IsEnabled = false;
+            DebugBox.IsEnabled = false;
             string logpath = "";
             string savepath = Path.Text;
             if (savepath != "")
@@ -57,8 +59,10 @@ namespace locationserver
                 }
             }
             timeout = short.Parse(Timebox.Text);
+            r = new Thread(() => RunServer(timeout, Log));
             Log = new Logging(logpath, savepath);
-            Task taskA = Task.Run(() => RunServer(timeout, Log));
+            // Task taskA = Task.Run(() => RunServer(timeout, Log));
+                r.Start();
             Status.AppendText("Server Started... \n");
         }
         static void RunServer(short timeout, Logging Log)
@@ -93,7 +97,9 @@ namespace locationserver
             SaveLog.IsEnabled = false;
             Timebox.IsEnabled = true;
             Path.IsEnabled = true;
-            Status.AppendText("Server stopped \n");
+            DebugBox.IsEnabled = true;
+           r.Abort();
+            Status.AppendText("Server Stopped \n");
 
         }
         public void Status_TextChanged(object sender, TextChangedEventArgs e)
