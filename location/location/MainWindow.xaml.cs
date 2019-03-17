@@ -58,7 +58,7 @@ namespace location
                         location = sr.ReadLine();
                         if (response.Contains("404 Not Found"))
                         {
-                            Status.AppendText(response);
+                            Status.AppendText(response +"\n");
                         }
                         else
                         {
@@ -127,10 +127,10 @@ namespace location
                         {
                             OH = sr.ReadLine();
                         }
-                        location = sr.ReadLine() + "\r\n";
+                        location = sr.ReadLine();
                         while (sr.Peek() >= 0)
                         {
-                            location += sr.ReadLine() + "\r\n";
+                            location += sr.ReadLine() + "\n";
                         }
 
                         if (response.Contains("404 Not Found"))
