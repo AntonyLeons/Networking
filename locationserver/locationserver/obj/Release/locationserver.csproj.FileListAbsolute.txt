@@ -27,3 +27,4 @@ G:\GitHub\Networking\locationserver\locationserver\obj\Release\locationserver.cs
 G:\GitHub\Networking\locationserver\locationserver\obj\Release\locationserver.csproj.CoreCompileInputs.cache
 G:\GitHub\Networking\locationserver\locationserver\obj\Release\locationserver.exe
 G:\GitHub\Networking\locationserver\locationserver\obj\Release\locationserver.pdb
+G:\GitHub\Networking\locationserver\locationserver\obj\Release\locationserver.csprojAssemblyReference.cache

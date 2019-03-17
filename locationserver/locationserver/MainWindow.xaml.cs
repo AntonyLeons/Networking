@@ -417,11 +417,13 @@ namespace locationserver
         }
         private void SaveLog_Click_1(object sender, RoutedEventArgs e)
         {
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "Log"; // Default file name
-            dlg.DefaultExt = ".txt"; // Default file extension
-            dlg.Title = "Save Log";
-            dlg.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
+            SaveFileDialog dlg = new SaveFileDialog
+            {
+                FileName = "Log", // Default file name
+                DefaultExt = ".txt", // Default file extension
+                Title = "Save Log",
+                Filter = "Text documents (.txt)|*.txt" // Filter files by extension
+            };
 
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
