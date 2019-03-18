@@ -371,7 +371,6 @@ namespace locationserver
                 {
                     socketStream.Close();
                     connection.Close();
-
                     Log.WriteToLog(Host, input, State, debug);
                 }
             }

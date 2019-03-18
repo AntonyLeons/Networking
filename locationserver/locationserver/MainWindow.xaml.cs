@@ -20,7 +20,7 @@ namespace locationserver
         static Dictionary<string, string> data = new Dictionary<string, string>();
         static List<string> log = new List<string>();
         public static Logging Log;
-        public static Thread r;
+       public static TcpListener listener;
         public short timeout { get; private set; }
         public MainWindow()
         {
@@ -55,14 +55,13 @@ namespace locationserver
                 }
             }
             timeout = short.Parse(Timebox.Text);
-            r = new Thread(() => RunServer(timeout, Log));
+            Thread r = new Thread(() => RunServer(timeout, Log));
             Log = new Logging(logpath, savepath);
             r.Start();
             Status.AppendText("Server Started... \n");
         }
         static void RunServer(short timeout, Logging Log) /// From Brians Youtube
         {
-            TcpListener listener;
             Socket connection;
 
             Handler RequestHandler;
@@ -93,7 +92,7 @@ namespace locationserver
             Timebox.IsEnabled = true;
             Path.IsEnabled = true;
             DebugBox.IsEnabled = true;
-            r.Abort();
+            listener.Stop();
             Status.AppendText("Server Stopped \n");
 
         }
