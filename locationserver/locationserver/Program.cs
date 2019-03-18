@@ -39,7 +39,7 @@ namespace locationserver
                             break;
                     }
                 }
-                if (savepath != null)
+                if (savepath != "")
                 {
                     try
                     {
