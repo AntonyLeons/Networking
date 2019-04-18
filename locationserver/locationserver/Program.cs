@@ -11,7 +11,7 @@ namespace locationserver
 {
     public class Program
     {
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)] /// hybrid application from https://stackoverflow.com/questions/5339193/wpf-console-hybrid-application
         static extern bool FreeConsole();
         static Dictionary<string, string> data = new Dictionary<string, string>();
         public static Logging Log;
@@ -39,7 +39,7 @@ namespace locationserver
                             break;
                     }
                 }
-                if (savepath != null)
+                if (savepath != "")
                 {
                     try
                     {
@@ -49,6 +49,7 @@ namespace locationserver
                             string[] entrysplit = entry.Split();
                             data.Add(entrysplit[0], entrysplit[1]);
                         }
+                        Console.WriteLine("file found and data loaded");
                     }
                     catch
                     {
@@ -87,7 +88,6 @@ namespace locationserver
 
                     Thread t = new Thread(() => RequestHandler.doRequest(connection, Log, timeout, debug));
                     t.Start();
-                    //Console.WriteLine("Connection Recieved");
                 }
             }
             catch (Exception e)
@@ -115,8 +115,11 @@ namespace locationserver
                 string State = "";
                 try
                 {
-                    socketStream.ReadTimeout = timeout;
-                    socketStream.WriteTimeout = timeout;
+                    if (timeout > 0)
+                    {
+                        socketStream.ReadTimeout = timeout;
+                        socketStream.WriteTimeout = timeout;
+                    }
                     StreamWriter sw = new StreamWriter(socketStream);
                     StreamReader sr = new StreamReader(socketStream);
                     sw.AutoFlush = true;
@@ -153,7 +156,7 @@ namespace locationserver
                     {
                         post = true;
                     }
-                    if (sections.Count >= 2) //check
+                    if (sections.Count >= 2) //check number of arguments
                     {
                         if (sections[1].StartsWith("/"))
                         {
@@ -368,14 +371,13 @@ namespace locationserver
                 {
                     socketStream.Close();
                     connection.Close();
-
                     Log.WriteToLog(Host, input, State, debug);
                 }
             }
         }
 
 
-        public class Logging
+        public class Logging /// based on example from https://stackoverflow.com/questions/2954900/simple-multithread-safe-log-class
         {
             public static string LogFile = null;
             public static string savefile = null;
@@ -390,7 +392,7 @@ namespace locationserver
 
             public void WriteToLog(string Host, string input, string State, bool debug)
             {
-                string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; ///35 mins
+                string line = Host + " - - " + DateTime.Now.ToString("'['dd'/'MM'/'yyyy':'HH':'mm':'ss zz00']'") + " \"" + input + "\" " + State; 
                 lock (locker)
                 {
                     Console.WriteLine(line);

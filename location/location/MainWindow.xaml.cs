@@ -31,13 +31,16 @@ namespace location
         {
             try
             {
+
                 TcpClient client = new TcpClient();
-                string username = null;
                 string location = null;
 
                 client.Connect(Address.Text, short.Parse(Port.Text));
-                client.ReceiveTimeout = 1000;
-                client.SendTimeout = 1000;
+                if (short.Parse(TimeBox.Text) > 0)
+                {
+                    client.ReceiveTimeout = short.Parse(TimeBox.Text);
+                    client.SendTimeout = short.Parse(TimeBox.Text);
+                }
 
                 StreamWriter sw = new StreamWriter(client.GetStream());
                 StreamReader sr = new StreamReader(client.GetStream());
@@ -54,7 +57,7 @@ namespace location
                         location = sr.ReadLine();
                         if (response.Contains("404 Not Found"))
                         {
-                            Status.AppendText(response);
+                            Status.AppendText(response +"\n");
                         }
                         else
                         {
@@ -123,10 +126,10 @@ namespace location
                         {
                             OH = sr.ReadLine();
                         }
-                        location = sr.ReadLine() + "\r\n";
+                        location = sr.ReadLine() + "\n";
                         while (sr.Peek() >= 0)
                         {
-                            location += sr.ReadLine() + "\r\n";
+                            location += sr.ReadLine() + "\n";
                         }
 
                         if (response.Contains("404 Not Found"))
@@ -186,13 +189,21 @@ namespace location
 
             catch (Exception x)
             {
-                Status.AppendText("Something went wrong + \n");
+
+                if (Debug.IsChecked == true)
+                {
+                    Status.AppendText(x.ToString());
+                }
+                else
+                {
+                    Status.AppendText("Something went wrong + \n");
+                }
             }
         }
 
         private void Status_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Status.ScrollToEnd();
+            Status.ScrollToEnd(); ///autoscroll
         }
     }
 }

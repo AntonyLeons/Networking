@@ -11,7 +11,9 @@ namespace location
 {
     class Program
     {
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        private static bool debug;
+
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)] /// hybrid application from https://stackoverflow.com/questions/5339193/wpf-console-hybrid-application
         static extern bool FreeConsole();
 
         [STAThread]
@@ -21,12 +23,13 @@ namespace location
             {
                 try
                 {
-                    TcpClient client = new TcpClient();
+                    TcpClient client = new TcpClient();  //from Brians panopto
                     string host = "whois.net.dcs.hull.ac.uk";
                     int port = 43;
                     string protocol = "whois";
                     string username = null;
                     string location = null;
+                    short timeout = 1000;
                     for (int i = 0; i < args.Length; i++)
                     {
                         switch (args[i])
@@ -36,6 +39,8 @@ namespace location
                             case "-h9":
                             case "-h0":
                             case "-h1": protocol = args[i]; break;
+                            case "-d": debug = true; break;
+                            case "-t": timeout = short.Parse(args[++i]); break; /// detect arguments
 
                             default:
                                 if (username == null)
@@ -57,10 +62,12 @@ namespace location
                         {
                             Console.WriteLine("Too few arguments");
                         }
-                    
                     client.Connect(host, port);
-                    client.ReceiveTimeout = 1000;
-                    client.SendTimeout = 1000;
+                    if (timeout > 0) /// timeout
+                    {
+                        client.ReceiveTimeout = timeout;
+                        client.SendTimeout = timeout;
+                    }
                     
                     StreamWriter sw = new StreamWriter(client.GetStream());
                     StreamReader sr = new StreamReader(client.GetStream());
@@ -189,15 +196,22 @@ namespace location
 
                 catch (Exception e)
                 {
-                    Console.WriteLine("Something went wrong");
-                    Console.WriteLine(e);
+                    if(debug==true) //debug
+                    {
+                        Console.WriteLine(e);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Something went wrong");
+                    }
+                   
                 }
                
                 return 0;
             }
             else
             {
-                FreeConsole();
+                FreeConsole(); /// open ui
                 var app = new App();
                 return app.Run();
             }
