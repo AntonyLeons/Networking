@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 language: csharp
 dotnet: 2.2
 mono: none
