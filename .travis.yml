@@ -1,5 +1,6 @@
 dist: xenial
 language: csharp
+dotnet: 2.2
 script:
   - dotnet add package Microsoft.Extensions.Configuration.Abstractions --version 2.2.0
   - msbuild /p:Configuration=Release location/location.sln
