@@ -29,9 +29,7 @@ namespace location
                     string protocol = "whois";
                     string username = null;
                     string location = null;
-#pragma warning disable CS0219 // Variable is assigned but its value is never used
                     bool debug = false;
-#pragma warning restore CS0219 // Variable is assigned but its value is never used
                     short timeout = 1000;
                     for (int i = 0; i < args.Length; i++)
                     {
