@@ -1,9 +1,11 @@
 dist: xenial
 language: csharp
-mono: none
 dotnet: 2.2
+mono: none
+matrix:
+  include:
+    - solution: location/location.sln
+    - solution: location/location.sln
 script:
   - dotnet restore
-  - dotnet add package Microsoft.Extensions.Configuration.Abstractions --version 2.2.0
-  - msbuild /p:Configuration=Release location/location.sln
-  - msbuild /p:Configuration=Release locationserver/locationserver.sln
+  - dotnet test
