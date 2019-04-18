@@ -8,6 +8,6 @@ matrix:
     - solution: location/location.sln
 script:
   - dotnet watch --verbose run
-  - dotnet build /$solution
-  - dotnet run
-  - dotnet test /$soultion
+  - dotnet build /$TRAVIS_SOLUTION
+  - dotnet run /$TRAVIS_SOLUTION
+  - dotnet test /$TRAVIS_SOLUTION
