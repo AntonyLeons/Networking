@@ -2,12 +2,14 @@ dist: bionic
 language: csharp
 dotnet: 2.2
 mono: none
+env:
+  global:
+  - path =
 matrix:
   include:
-    - solution: location/location.sln
-    - solution: location/location.sln
+    - solution: /location/location.sln
+    - solution: /locationserver/locationserver.sln
 script:
-  - dotnet watch --verbose run
-  - dotnet build /$TRAVIS_SOLUTION
-  - dotnet run /$TRAVIS_SOLUTION
-  - dotnet test /$TRAVIS_SOLUTION
+  - dotnet build --project $TRAVIS_SOLUTION
+  - dotnet run --project $TRAVIS_SOLUTION
+  - dotnet test --project $TRAVIS_SOLUTION
