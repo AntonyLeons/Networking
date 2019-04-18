@@ -1,0 +1,14 @@
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\bin\Debug\locationserver.exe.config
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\bin\Debug\locationserver.exe
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\bin\Debug\locationserver.pdb
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\MainWindow.g.cs
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\App.g.cs
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver_MarkupCompile.cache
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver_MarkupCompile.lref
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\MainWindow.baml
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.g.resources
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.Properties.Resources.resources
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.csproj.GenerateResource.cache
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.csproj.CoreCompileInputs.cache
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.exe
+C:\Users\anton\Documents\GitHub\Networking\locationserver\locationserver\obj\Debug\locationserver.pdb

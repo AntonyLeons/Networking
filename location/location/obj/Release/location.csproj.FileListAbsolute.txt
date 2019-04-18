@@ -1,0 +1,14 @@
+C:\Users\anton\Documents\GitHub\Networking\location\location\bin\Release\location.exe.config
+C:\Users\anton\Documents\GitHub\Networking\location\location\bin\Release\location.exe
+C:\Users\anton\Documents\GitHub\Networking\location\location\bin\Release\location.pdb
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\MainWindow.g.cs
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\App.g.cs
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\location_MarkupCompile.cache
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\location_MarkupCompile.lref
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\MainWindow.baml
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\location.g.resources
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\location.Properties.Resources.resources
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\location.csproj.GenerateResource.cache
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\location.csproj.CoreCompileInputs.cache
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\location.exe
+C:\Users\anton\Documents\GitHub\Networking\location\location\obj\Release\location.pdb
