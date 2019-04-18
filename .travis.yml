@@ -7,5 +7,6 @@ matrix:
     - solution: location/location.sln
     - solution: location/location.sln
 script:
-  - dotnet restore
+  - dotnet watch --verbose run
+  - dotnet build
   - dotnet test
