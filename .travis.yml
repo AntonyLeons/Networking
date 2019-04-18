@@ -1,6 +1,7 @@
+dist: xenial
 language: csharp
-solution: location.sln
-solution: locationserver.sln
+solution: location/location.sln
+solution: locationserver/locationserver.sln
 
 matrix:
   include:
