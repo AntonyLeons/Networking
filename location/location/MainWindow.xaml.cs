@@ -33,7 +33,6 @@ namespace location
             {
 
                 TcpClient client = new TcpClient();
-                string username = null;
                 string location = null;
 
                 client.Connect(Address.Text, short.Parse(Port.Text));
