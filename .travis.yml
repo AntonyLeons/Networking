@@ -1,7 +1,6 @@
 dist: bionic
 language: csharp
 dotnet: 2.2
-mono: none
 before_script:
   - chmod +x location/location.sln
   - chmod +x locationserver/locationserver.sln
