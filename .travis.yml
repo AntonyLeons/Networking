@@ -7,8 +7,8 @@ env:
   - path =
 matrix:
   include:
-    - solution: /location/location.sln
-    - solution: /locationserver/locationserver.sln
+    - solution: location/location.sln
+    - solution: locationserver/locationserver.sln
 script:
   - dotnet build location | $TRAVIS_SOLUTION
   - dotnet run --project $TRAVIS_SOLUTION
