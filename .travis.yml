@@ -4,6 +4,5 @@ solution: location/location.sln
 script:
   - msbuild /p:Configuration=Release location/location.sln
   - mono ./packages/xunit.runners.*/tools/xunit.console.clr4.exe ./location/bin/Release/location.dll
-  solution: locationserver/locationserver.sln
   - msbuild /p:Configuration=Release location/locationserver.sln
   - mono ./packages/xunit.runners.*/tools/xunit.console.clr4.exe ./locationserver/bin/Release/locationserver.dll
