@@ -1,0 +1,9 @@
+language: csharp
+solution: location.sln
+solution: locationserver.sln
+
+matrix:
+  include:
+    - dotnet: 2.2
+      mono: none
+    - mono: latest
